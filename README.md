@@ -24,7 +24,7 @@ options = {
 
 serified = <any> | {
     serifier: <primitive>,
-    className: <string>,
+    type: <string>,
     value: <any>
 }
 ```
