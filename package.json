@@ -1,0 +1,45 @@
+{
+	"name": "serify-deserify",
+	"version": "1.0.0",
+	"description": "Reversibly transform unserializable values into serializable ones.",
+	"main": "index.js",
+	"scripts": {
+		"build": "babel src -d dist",
+		"test": "mocha './{,!(node_modules)/**}/*.test.js'"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/karmaniverous/serify-deserify.git"
+	},
+	"keywords": [
+		"serialize"
+	],
+	"author": "Jason G. Williscroft",
+	"license": "ISC",
+	"bugs": {
+		"url": "https://github.com/karmaniverous/serify-deserify/issues"
+	},
+	"homepage": "https://github.com/karmaniverous/serify-deserify#readme",
+	"devDependencies": {
+		"@babel/cli": "^7.17.10",
+		"@babel/core": "^7.18.2",
+		"@babel/eslint-parser": "^7.18.2",
+		"@babel/plugin-syntax-import-assertions": "^7.17.12",
+		"@babel/preset-env": "^7.18.2",
+		"chai": "^4.3.6",
+		"chai-match-pattern": "^1.3.0",
+		"eslint": "^8.17.0",
+		"eslint-config-standard": "^17.0.0",
+		"eslint-plugin-import": "^2.26.0",
+		"eslint-plugin-mocha": "^10.0.5",
+		"eslint-plugin-node": "^11.1.0",
+		"mocha": "^10.0.0",
+		"prettier": "^2.6.2"
+	},
+	"mocha": {
+		"require": [
+			"chai-match-pattern"
+		],
+		"spec": "./{,!(node_modules)/**}/*.test.*js"
+	}
+}

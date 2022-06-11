@@ -1,0 +1,17 @@
+{
+	"git.autofetch": true,
+	"diffEditor.ignoreTrimWhitespace": false,
+	"javascript.updateImportsOnFileMove.enabled": "always",
+	"git.enableSmartCommit": true,
+	"[javascript]": {
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
+	},
+	"editor.formatOnSave": true,
+	"prettier.useTabs": true,
+	"prettier.singleQuote": true,
+	"editor.tabSize": 2,
+	"editor.formatOnPaste": true,
+	"editor.defaultFormatter": "esbenp.prettier-vscode",
+	"prettier.proseWrap": "always",
+	"editor.accessibilitySupport": "off"
+}
