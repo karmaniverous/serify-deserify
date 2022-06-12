@@ -3,7 +3,7 @@
 import { inspect } from 'util';
 
 import chai from 'chai';
-chai.should();
+const should = chai.should();
 
 import { serify, deserify } from './index.mjs';
 
@@ -28,12 +28,28 @@ beforeEach(() => {
 
 describe('serify', () => {
 	describe('serializable', () => {
+		it('undefined', () => {
+			const v = undefined;
+
+			const s = serify(v);
+
+			should.equal(s, v);
+		});
+
+		it('null', () => {
+			const v = null;
+
+			const s = serify(v);
+
+			should.equal(s, v);
+		});
+
 		it('bool', () => {
 			const v = true;
 
 			const s = serify(v);
 
-			s.should.deep.equal(v);
+			s.should.equal(v);
 		});
 
 		it('number', () => {
@@ -41,7 +57,7 @@ describe('serify', () => {
 
 			const s = serify(v);
 
-			s.should.deep.equal(v);
+			s.should.equal(v);
 		});
 
 		it('string', () => {
@@ -49,7 +65,7 @@ describe('serify', () => {
 
 			const s = serify(v);
 
-			s.should.deep.equal(v);
+			s.should.equal(v);
 		});
 
 		it('object', () => {
@@ -238,12 +254,28 @@ describe('serify', () => {
 
 describe('deserify', () => {
 	describe('serializable', () => {
+		it('undefined', () => {
+			const v = undefined;
+
+			const d = deserify(v);
+
+			should.equal(d, v);
+		});
+
+		it('null', () => {
+			const v = null;
+
+			const d = deserify(v);
+
+			should.equal(d, v);
+		});
+
 		it('bool', () => {
 			const v = true;
 
 			const d = deserify(v);
 
-			d.should.deep.equal(v);
+			d.should.equal(v);
 		});
 
 		it('number', () => {
@@ -251,7 +283,7 @@ describe('deserify', () => {
 
 			const d = deserify(v);
 
-			d.should.deep.equal(v);
+			d.should.equal(v);
 		});
 
 		it('string', () => {
@@ -259,7 +291,7 @@ describe('deserify', () => {
 
 			const d = deserify(v);
 
-			d.should.deep.equal(v);
+			d.should.equal(v);
 		});
 
 		it('object', () => {
