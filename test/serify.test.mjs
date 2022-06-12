@@ -5,7 +5,7 @@ import { inspect } from 'util';
 import chai from 'chai';
 const should = chai.should();
 
-import { serify, deserify } from './index.mjs';
+import { serify, deserify } from '../src/index.mjs';
 
 class Custom {
 	constructor(p) {

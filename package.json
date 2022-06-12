@@ -2,9 +2,9 @@
 	"name": "serify-deserify",
 	"version": "1.0.0",
 	"description": "Reversibly transform unserializable values into serializable ones.",
-	"main": "index.js",
+	"main": "lib/index.js",
 	"scripts": {
-		"build": "babel src -d dist",
+		"build": "babel src -d lib",
 		"test": "mocha './{,!(node_modules)/**}/*.test.*js'"
 	},
 	"repository": {
