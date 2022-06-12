@@ -1,55 +1,64 @@
-import kindOf from 'kind-of';
+import { isPlainObject, isPrimitive, isString } from 'is-what';
 
 import defaultOptions from './options.mjs';
 
-const serify_branch = (value, options) => {
-	if (kindOf(value) !== 'string')
-		for (const p in value) value[p] = serify_internal(value[p], options);
-};
+const serifyNode = (value, options) => {
+	if (isPrimitive(value)) return value;
 
-const serify_internal = (value, options) => {
-	let serified = value;
-	const valueType = kindOf(value);
+	const valueType = value.constructor?.name;
 	const serifyType = options.types[valueType];
 
 	if (serifyType) {
-		if (kindOf(serifyType.serifier) !== 'function')
+		if (typeof serifyType.serifier !== 'function')
 			throw new Error(`invalid ${valueType} serifier`);
 
-		serified = {
+		const serified = {
 			serifyKey: options.serifyKey,
 			type: valueType,
 			value: serifyType.serifier(value),
 		};
 
-		serify_branch(serified.value, options);
-	} else serify_branch(serified, options);
+		if (!isString(serified.value))
+			for (const p in serified.value)
+				serified.value[p] = serifyNode(serified.value[p], options);
 
-	return serified;
+		return serified;
+	}
+
+	for (const p in value) value[p] = serifyNode(value[p], options);
+
+	return value;
 };
 
 export const serify = (value, options = {}) =>
-	serify_internal(value, { ...defaultOptions, ...options });
+	serifyNode(value, { ...defaultOptions, ...options });
 
-const deserify_internal = (value, options = {}) => {
-	if (!value || kindOf(value) === 'string' || !Object.keys(value).length)
-		return value;
+const deserifyNode = (value, options = {}) => {
+	if (isPrimitive(value)) return value;
 
-	for (const p in value) value[p] = deserify_internal(value[p], options);
+	if (isPlainObject(value) && value.serifyKey === options.serifyKey) {
+		// eslint-disable-next-line no-prototype-builtins
+		if (!value.hasOwnProperty('type') || !value.hasOwnProperty('value'))
+			throw new Error(`invalid serified object: ${JSON.stringify(value)}`);
 
-	if (value.serifyKey === options.serifyKey) {
 		const serifyType = options.types[value.type];
 		if (!serifyType)
 			throw new Error(`${value.type} is not a supported serify type`);
 
-		if (kindOf(serifyType.deserifier) !== 'function')
+		if (typeof serifyType.deserifier !== 'function')
 			throw new Error(`invalid ${value.type} deserifier`);
+
+		if (!isString(value.value))
+			for (const p in value.value)
+				value.value[p] = deserifyNode(value.value[p], options);
 
 		return serifyType.deserifier(value.value);
 	}
+
+	for (const p in value) value[p] = deserifyNode(value[p], options);
 
 	return value;
 };
 
 export const deserify = (value, options = {}) =>
-	deserify_internal(value, { ...defaultOptions, ...options });
+	deserifyNode(value, { ...defaultOptions, ...options });

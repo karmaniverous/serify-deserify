@@ -1,19 +1,19 @@
 export default {
 	serifyKey: null,
 	types: {
-		bigint: {
+		BigInt: {
 			serifier: (unserified) => unserified.toString(),
 			deserifier: (serified) => BigInt(serified),
 		},
-		date: {
+		Date: {
 			serifier: (unserified) => unserified.getTime(),
 			deserifier: (serified) => new Date(serified),
 		},
-		map: {
+		Map: {
 			serifier: (unserified) => [...unserified.entries()],
 			deserifier: (serified) => new Map(serified),
 		},
-		set: {
+		Set: {
 			serifier: (unserified) => [...unserified.values()],
 			deserifier: (serified) => new Set(serified),
 		},

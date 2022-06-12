@@ -37,12 +37,9 @@
 		"prettier": "^2.6.2"
 	},
 	"mocha": {
-		"require": [
-			"chai-match-pattern"
-		],
 		"spec": "./{,!(node_modules)/**}/*.test.*js"
 	},
 	"dependencies": {
-		"kind-of": "^6.0.3"
+		"is-what": "^4.1.7"
 	}
 }
