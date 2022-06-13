@@ -39,9 +39,7 @@ export const serify = (value, options) =>
 	serifyNode(value, mergeOptions(options));
 
 export const createReduxMiddleware = (options) => () => (next) => (action) => {
-	const serified = serify(action.payload, options);
-	console.log(serified);
-	action.payload = serified;
+	action.payload = serify(action.payload, options);
 	next(action);
 };
 
