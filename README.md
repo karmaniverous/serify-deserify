@@ -13,7 +13,7 @@ never will.
 There are tons of custom serializers that address this issue, notably
 [`serialize-javascript`](https://www.npmjs.com/package/serialize-javascript) and
 [`serializr`](https://www.npmjs.com/package/serializr). Unfortunately, some key
-Javascript tool like [Redux](https://redux.js.org) explicitly depend on
+Javascript tools like [Redux](https://redux.js.org) explicitly depend on
 `JSON.stringify` & `JSON.parse`. So if you use Redux, none of those fancy
 serializers will help you get a Date or a BigInt into your store and back out
 again in one piece.
