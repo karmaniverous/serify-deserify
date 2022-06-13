@@ -82,13 +82,12 @@ Review the [unit tests](/src/index.test.mjs) for more examples of how to use
 
 ## Serifiable Types
 
-`serify` and `deserify` will work on objects (and arrays, which are objects,
-ok?) of any serifiable type.
+`serify` and `deserify` will work on values of any serifiable type.
 
 A _serifiable type_ is any type that is:
 
-- reversibly supported by `JSON.stringify` and `JSON.parse`, i.e. primitive
-  types, plain objects, and arrays
+- reversibly supported by `JSON.stringify` and `JSON.parse`, i.e. booleans,
+  numbers, strings, plain objects, and arrays
 - natively supported by `serify`, i.e. `BigInt`, `Date`, `Map`, and `Set`
 - added to `serify` as a custom type
 - composed exclusively of any of the above, i.e. arrays of BigInt-keyed Maps of
@@ -113,5 +112,6 @@ store contains objects with exactly this form that were _not_ produced by
 ```
 
 `deserify` will attempt to deserify this object and your process will fail. In
-this case, simply add a unique, non-null `serifyKey` to your `options` object
-and everything will work again.
+this case, simply add a non-null `serifyKey` of a serifiable primitive type
+(meaning a boolean, number, or string) to your `options` object and everything
+will work again.
