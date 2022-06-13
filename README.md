@@ -197,7 +197,7 @@ const {
   test: { value },
 } = getState();
 
-// Of the retrieved object is still serified.
+// The retrieved object is still serified.
 console.log(value.constructor.name); // Object
 console.log(value); // { serifyKey: null, type: "BigInt", value: "42" }
 
