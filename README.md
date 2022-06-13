@@ -127,8 +127,9 @@ new type to your serify options!
 When retrieving values from the Redux store, either deserify them explicitly or
 wrap your selectors in the `deserify` function.
 
-`createReduxMiddleware` will work anyplace Redux is used, but we're all supposed
-to be using Redux Toolkit now. So here's an example using Redux Toolkit:
+`createReduxMiddleware` will work anyplace Redux is used, but
+[we're all supposed to be using Redux Toolkit now](https://redux-toolkit.js.org/introduction/getting-started#purpose).
+So here's an example using Redux Toolkit:
 
 ```javascript
 // Let's create a custom class to send to our Redux store.
@@ -173,8 +174,8 @@ const store = configureStore({
   }),
   middleware: (getDefaultMiddleware) => [
     ...getDefaultMiddleware(),
-    // Add the serify middleware last, or Redux Toolkit's serializableCheck will
-    // reject values before they are serified!
+    // Add the serify middleware last, or Redux Toolkit's serializableCheck
+    // will reject values before they are serified!
     serifyMiddleware,
   ],
 });
