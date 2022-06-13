@@ -2,6 +2,11 @@ import { isPlainObject, isPrimitive, isString } from 'is-what';
 
 import defaultOptions from './options.mjs';
 
+const mergeOptions = (options = {}) => ({
+	serifyKey: options.serifyKey ?? defaultOptions.serifyKey,
+	types: { ...defaultOptions.types, ...options.types },
+});
+
 const serifyNode = (value, options) => {
 	if (isPrimitive(value)) return value;
 
@@ -30,8 +35,15 @@ const serifyNode = (value, options) => {
 	return value;
 };
 
-export const serify = (value, options = {}) =>
-	serifyNode(value, { ...defaultOptions, ...options });
+export const serify = (value, options) =>
+	serifyNode(value, mergeOptions(options));
+
+export const createReduxMiddleware = (options) => () => (next) => (action) => {
+	const serified = serify(action.payload, options);
+	console.log(serified);
+	action.payload = serified;
+	next(action);
+};
 
 const deserifyNode = (value, options = {}) => {
 	if (isPrimitive(value)) return value;
@@ -60,5 +72,5 @@ const deserifyNode = (value, options = {}) => {
 	return value;
 };
 
-export const deserify = (value, options = {}) =>
-	deserifyNode(value, { ...defaultOptions, ...options });
+export const deserify = (value, options) =>
+	deserifyNode(value, mergeOptions(options));

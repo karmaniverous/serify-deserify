@@ -115,3 +115,96 @@ store contains objects with exactly this form that were _not_ produced by
 this case, simply add a non-null `serifyKey` of a serifiable primitive type
 (meaning a boolean, number, or string) to your `options` object and everything
 will work again.
+
+## Redux
+
+The `createReduxMiddleware` function generates a Redux middleware that will
+serify every value pushed to your Redux store. If you use
+[Redux Toolkit](https://redux-toolkit.js.org/), leave the default
+`serializeCheck` middleware in place and it will notify you if you need to add a
+new type to your serify options!
+
+When retrieving values from the Redux store, either deserify them explicitly or
+wrap your selectors in the `deserify` function.
+
+`createReduxMiddleware` will work anyplace Redux is used, but we're all supposed
+to be using Redux Toolkit now. So here's an example using Redux Toolkit:
+
+```javascript
+// Let's create a custom class to send to our Redux store.
+class Custom {
+	constructor(p) {
+		this.p = p;
+	}
+}
+
+// Here's a serify options object that supports the new class.
+const serifyOptions = {
+	types: {
+		Custom: {
+			serifier: (u) => u.p,
+			deserifier: (s) => new Custom(s),
+		},
+	},
+};
+
+// Generate a serify Redux middleware.
+import { createReduxMiddleware, deserify } from '../src/index.mjs';
+const serifyMiddleware = createReduxMiddleware(serifyOptions);
+
+// Import Redux Toolkit.
+import { combineReducers, configureStore, createSlice } from '@reduxjs/toolkit';
+
+// Construct a Redux slice.
+const testSlice = createSlice({
+	name: 'test',
+	initialState: { value: null },
+	reducers: {
+		setValue: (state, { payload }) => {
+			state.value = payload;
+		},
+	},
+});
+
+// Configure your Redux store.
+const store = configureStore({
+	reducer: combineReducers({
+		test: testSlice.reducer,
+	}),
+	middleware: (getDefaultMiddleware) => [
+		...getDefaultMiddleware(),
+		// Add the serify middleware last, or Redux Toolkit's serializableCheck will
+		// reject values before they are serified!
+		serifyMiddleware,
+	],
+});
+
+// Get redux functions.
+const { setValue } = testSlice.actions;
+const { dispatch, getState } = store;
+
+/* LET'S TRY IT OUT... */
+
+// Let's store a BigInt in the Redux store.
+const unserializable = 42n; // Normally Redux would choke on this!
+
+// Try sending it to the store.
+dispatch(setValue(unserializable)); // SUCCEEDS!
+
+// Retrieve the value the store.
+const {
+	test: { value },
+} = getState();
+
+// Of the retrieved object is still serified.
+console.log(value.constructor.name); // Object
+console.log(value); // { serifyKey: null, type: "BigInt", value: "42" }
+
+// You could wrap a selector in deserify, but for now we'll just deserify
+// the value explicitly.
+const deserified = deserify(value);
+
+// What did we get?
+console.log(deserified.constructor.name); // BigInt
+console.log(deserified); // 42n
+```
