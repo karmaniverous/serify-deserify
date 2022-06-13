@@ -103,7 +103,7 @@ Consider the highly unlikely event that some data you retrieve from your Redux
 store contains objects with exactly this form that were _not_ produced by
 `serify`:
 
-```
+```javascript
 {
   serifyKey: null,
   type: <string>,
