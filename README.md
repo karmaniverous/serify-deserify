@@ -15,8 +15,8 @@ There are tons of custom serializers that address this issue, notably
 [`serializr`](https://www.npmjs.com/package/serializr). Unfortunately, some key
 Javascript tools like [Redux](https://redux.js.org) explicitly depend on
 `JSON.stringify` & `JSON.parse`. So if you use Redux, none of those fancy
-serializers will help you get a Date or a BigInt into your store and back out
-again in one piece.
+serializers will help you get a `Date` or a `BigInt` into your store and back
+out again in one piece.
 
 `serify` solves this problem by encoding those objects (or ones containing them)
 into ones that `JSON.stringify` can serialize without throwing an exception.
@@ -49,7 +49,8 @@ console.log(unserializable); // 42n
 dispatch(setValue(unserializable)); // FAILS!
 
 // Serify the value before storing.
-const serializable = serify(unserializable); // Use an options param for custom types.
+// Use an options param for custom types.
+const serializable = serify(unserializable);
 
 // What does it look like now?
 console.log(serializable.constructor.name); // Object
@@ -68,7 +69,8 @@ console.log(value.constructor.name); // Object
 console.log(value); // { serifyKey: null, type: "BigInt", value: "42" }
 
 // Now deserify the value.
-const deserified = deserify(value); // Use an options param for custom types.
+// Use an options param for custom types.
+const deserified = deserify(value);
 
 // What did we get?
 console.log(deserified.constructor.name); // BigInt
@@ -79,6 +81,9 @@ Review the [unit tests](/src/index.test.mjs) for more examples of how to use
 `serify` and `deserify`.
 
 ## Serifiable Types
+
+`serify` and `deserify` will work on objects (and arrays, which are objects,
+ok?) of any serifiable type.
 
 A _serifiable type_ is any type that is:
 
@@ -95,8 +100,9 @@ just pass in an `options` object that follows the
 
 ## serifyKey
 
-Consider the highly unlikely event that your data contains objects with exactly
-this form:
+Consider the highly unlikely event that some data you retrieve from your Redux
+store contains objects with exactly this form that were _not_ produced by
+`serify`:
 
 ```
 {
