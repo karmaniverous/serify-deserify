@@ -8,7 +8,7 @@ const mergeOptions = (options = {}) => ({
 });
 
 const serifyNode = (value, options) => {
-  if (isPrimitive(value)) return value;
+  if (isPrimitive(value) || value.serifyKey === options.serifyKey) return value;
 
   const valueType = value.constructor?.name;
   const serifyType = options.types[valueType];
@@ -23,15 +23,19 @@ const serifyNode = (value, options) => {
       value: serifyType.serifier(value),
     };
 
-    if (!isString(serified.value))
+    if (!isString(serified.value)) {
+      const descriptors = Object.getOwnPropertyDescriptors(serified.value);
       for (const p in serified.value)
-        serified.value[p] = serifyNode(serified.value[p], options);
-
+        if (descriptors[p].writable)
+          serified.value[p] = serifyNode(serified.value[p], options);
+    }
     return serified;
   }
 
-  for (const p in value) value[p] = serifyNode(value[p], options);
-
+  const descriptors = Object.getOwnPropertyDescriptors(value);
+  for (const p in value) {
+    if (descriptors[p].writable) value[p] = serifyNode(value[p], options);
+  }
   return value;
 };
 
