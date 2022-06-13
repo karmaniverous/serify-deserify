@@ -12,7 +12,19 @@
 		"url": "git+https://github.com/karmaniverous/serify-deserify.git"
 	},
 	"keywords": [
-		"serialize"
+		"bigint",
+		"deserialize",
+		"date",
+		"json",
+		"map",
+		"parse",
+		"redux",
+		"serialize",
+		"serializable",
+		"set",
+		"state",
+		"stringify",
+		"type"
 	],
 	"author": "Jason G. Williscroft",
 	"license": "ISC",
