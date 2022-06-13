@@ -18,10 +18,10 @@ Javascript tools like [Redux](https://redux.js.org) explicitly depend on
 serializers will help you get a `Date` or a `BigInt` into your store and back
 out again in one piece.
 
-`serify` solves this problem by encoding those objects (or ones containing them)
-into ones that `JSON.stringify` can serialize without throwing an exception.
-After these objects are retrieved and deserialized with `JSON.parse`, `deserify`
-returns them to their original state.
+`serify` solves this problem by encoding those values (or structures containing
+them) into values that `JSON.stringify` can serialize without throwing an
+exception. After these values are retrieved and deserialized with `JSON.parse`,
+`deserify` returns them to their original state.
 
 ## Usage
 
