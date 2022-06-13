@@ -7,7 +7,7 @@
 		"editor.defaultFormatter": "esbenp.prettier-vscode"
 	},
 	"editor.formatOnSave": true,
-	"prettier.useTabs": true,
+	"prettier.useTabs": false,
 	"prettier.singleQuote": true,
 	"editor.tabSize": 2,
 	"editor.formatOnPaste": true,

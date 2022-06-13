@@ -133,19 +133,19 @@ to be using Redux Toolkit now. So here's an example using Redux Toolkit:
 ```javascript
 // Let's create a custom class to send to our Redux store.
 class Custom {
-	constructor(p) {
-		this.p = p;
-	}
+  constructor(p) {
+    this.p = p;
+  }
 }
 
 // Here's a serify options object that supports the new class.
 const serifyOptions = {
-	types: {
-		Custom: {
-			serifier: (u) => u.p,
-			deserifier: (s) => new Custom(s),
-		},
-	},
+  types: {
+    Custom: {
+      serifier: (u) => u.p,
+      deserifier: (s) => new Custom(s),
+    },
+  },
 };
 
 // Generate a serify Redux middleware.
@@ -157,26 +157,26 @@ import { combineReducers, configureStore, createSlice } from '@reduxjs/toolkit';
 
 // Construct a Redux slice.
 const testSlice = createSlice({
-	name: 'test',
-	initialState: { value: null },
-	reducers: {
-		setValue: (state, { payload }) => {
-			state.value = payload;
-		},
-	},
+  name: 'test',
+  initialState: { value: null },
+  reducers: {
+    setValue: (state, { payload }) => {
+      state.value = payload;
+    },
+  },
 });
 
 // Configure your Redux store.
 const store = configureStore({
-	reducer: combineReducers({
-		test: testSlice.reducer,
-	}),
-	middleware: (getDefaultMiddleware) => [
-		...getDefaultMiddleware(),
-		// Add the serify middleware last, or Redux Toolkit's serializableCheck will
-		// reject values before they are serified!
-		serifyMiddleware,
-	],
+  reducer: combineReducers({
+    test: testSlice.reducer,
+  }),
+  middleware: (getDefaultMiddleware) => [
+    ...getDefaultMiddleware(),
+    // Add the serify middleware last, or Redux Toolkit's serializableCheck will
+    // reject values before they are serified!
+    serifyMiddleware,
+  ],
 });
 
 // Get redux functions.
@@ -193,7 +193,7 @@ dispatch(setValue(unserializable)); // SUCCEEDS!
 
 // Retrieve the value the store.
 const {
-	test: { value },
+  test: { value },
 } = getState();
 
 // Of the retrieved object is still serified.
