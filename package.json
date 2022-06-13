@@ -1,6 +1,6 @@
 {
 	"name": "@karmaniverous/serify-deserify",
-	"version": "1.1.4",
+	"version": "1.2.0",
 	"description": "Reversibly transform unserializable values into serializable ones.",
 	"main": "lib/index.js",
 	"scripts": {
