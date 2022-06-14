@@ -103,7 +103,7 @@ Consider the highly unlikely event that some data you retrieve from your Redux
 store contains objects with exactly this form that were _not_ produced by
 `serify`:
 
-```javascript
+```
 {
   serifyKey: null,
   type: <string>,
@@ -150,7 +150,10 @@ const serifyOptions = {
 };
 
 // Generate a serify Redux middleware.
-import { createReduxMiddleware, deserify } from '../src/index.mjs';
+import {
+  createReduxMiddleware,
+  deserify,
+} from '@karmaniverous/serify-deserify';
 const serifyMiddleware = createReduxMiddleware(serifyOptions);
 
 // Import Redux Toolkit.
