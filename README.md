@@ -19,7 +19,7 @@ serializers will help you get a `Date` or a `BigInt` into your store and back
 out again in one piece.
 
 `serify` solves this problem by encoding those values (or structures containing
-them) into values that `JSON.stringify` can serialize without throwing an
+them) into values that `JSON.stringify` _can_ serialize without throwing an
 exception. After these values are retrieved and deserialized with `JSON.parse`,
 `deserify` returns them to their original state.
 
