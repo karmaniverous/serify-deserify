@@ -1,4 +1,4 @@
-import { isPlainObject, isPrimitive } from 'is-what';
+import { isArray, isPlainObject, isPrimitive } from 'is-what';
 
 import defaultOptions from './options.mjs';
 
@@ -26,16 +26,12 @@ const serifyNode = (value, options) => {
     return serified;
   }
 
-  const descriptors = Object.getOwnPropertyDescriptors(value);
-  for (const p in value) {
-    if (descriptors[p].writable) value[p] = serifyNode(value[p], options);
-    else if (descriptors[p].configurable) {
-      Object.defineProperty(value, p, { writable: true });
-      value[p] = serifyNode(value[p], options);
-      Object.defineProperty(value, p, { writable: false });
-    }
-  }
-  return value;
+  let copy;
+  if (isArray(value)) copy = [...value];
+  if (isPlainObject(value)) copy = { ...value };
+  for (const p in copy) copy[p] = serifyNode(copy[p], options);
+
+  return copy ?? value;
 };
 
 export const serify = (value, options) =>
@@ -64,17 +60,12 @@ const deserifyNode = (value, options = {}) => {
     return serifyType.deserifier(deserifyNode(value.value, options));
   }
 
-  const descriptors = Object.getOwnPropertyDescriptors(value);
-  for (const p in value) {
-    if (descriptors[p].writable) value[p] = deserifyNode(value[p], options);
-    else if (descriptors[p].configurable) {
-      Object.defineProperty(value, p, { writable: true });
-      value[p] = deserifyNode(value[p], options);
-      Object.defineProperty(value, p, { writable: false });
-    }
-  }
+  let copy;
+  if (isArray(value)) copy = [...value];
+  if (isPlainObject(value)) copy = { ...value };
+  for (const p in copy) copy[p] = deserifyNode(copy[p], options);
 
-  return value;
+  return copy ?? value;
 };
 
 export const deserify = (value, options) =>
