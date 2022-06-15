@@ -59,7 +59,9 @@ const deserifyNode = (value, options = {}) => {
     return serifyType.deserifier(deserifyNode(value.value, options));
   }
 
-  for (const p in value) value[p] = deserifyNode(value[p], options);
+  const descriptors = Object.getOwnPropertyDescriptors(value);
+  for (const p in value)
+    if (descriptors[p].writable) value[p] = deserifyNode(value[p], options);
 
   return value;
 };
