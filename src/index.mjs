@@ -1,4 +1,4 @@
-import { isPlainObject, isPrimitive, isString } from 'is-what';
+import { isPlainObject, isPrimitive } from 'is-what';
 
 import defaultOptions from './options.mjs';
 
@@ -20,15 +20,9 @@ const serifyNode = (value, options) => {
     const serified = {
       serifyKey: options.serifyKey,
       type: valueType,
-      value: serifyType.serifier(value),
+      value: serifyNode(serifyType.serifier(value), options),
     };
 
-    if (!isString(serified.value)) {
-      const descriptors = Object.getOwnPropertyDescriptors(serified.value);
-      for (const p in serified.value)
-        if (descriptors[p].writable)
-          serified.value[p] = serifyNode(serified.value[p], options);
-    }
     return serified;
   }
 
@@ -62,11 +56,7 @@ const deserifyNode = (value, options = {}) => {
     if (typeof serifyType.deserifier !== 'function')
       throw new Error(`invalid ${value.type} deserifier`);
 
-    if (!isString(value.value))
-      for (const p in value.value)
-        value.value[p] = deserifyNode(value.value[p], options);
-
-    return serifyType.deserifier(value.value);
+    return serifyType.deserifier(deserifyNode(value.value, options));
   }
 
   for (const p in value) value[p] = deserifyNode(value[p], options);

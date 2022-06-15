@@ -157,7 +157,10 @@ import {
 const serifyMiddleware = createReduxMiddleware(serifyOptions);
 
 // Import Redux Toolkit.
-import { combineReducers, configureStore, createSlice } from '@reduxjs/toolkit';
+// The import weirdness is only required to support Babel!
+import * as toolkitRaw from '@reduxjs/toolkit';
+const { combineReducers, configureStore, createSlice } =
+  toolkitRaw.default ?? toolkitRaw;
 
 // Construct a Redux slice.
 const testSlice = createSlice({
@@ -189,8 +192,8 @@ const { dispatch, getState } = store;
 
 /* LET'S TRY IT OUT... */
 
-// Let's store a BigInt in the Redux store.
-const unserializable = 42n; // Normally Redux would choke on this!
+// Put a BigInt into a Custom instance and store it in Redux.
+const unserializable = new Custom(42n); // Normally Redux would choke on this!
 
 // Try sending it to the store.
 dispatch(setValue(unserializable)); // SUCCEEDS!
@@ -201,14 +204,18 @@ const {
 } = getState();
 
 // The retrieved object is still serified.
-console.log(value.constructor.name); // Object
-console.log(value); // { serifyKey: null, type: "BigInt", value: "42" }
+console.log(value);
+// {
+//   serifyKey: null,
+//   type: 'Custom',
+//   value: { serifyKey: null, type: 'BigInt', value: '42' },
+// };
 
 // You could wrap a selector in deserify, but for now we'll just deserify
 // the value explicitly.
-const deserified = deserify(value);
+const deserified = deserify(value, serifyOptions);
 
 // What did we get?
-console.log(deserified.constructor.name); // BigInt
-console.log(deserified); // 42n
+console.log(deserified);
+// Custom { p: 42n }
 ```

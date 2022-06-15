@@ -443,10 +443,14 @@ describe('deserify', () => {
 
       const d = deserify(v);
 
-      inspect(d, false, null).should.equal(`Map(2) {
+      console.log(inspect(d, false, null));
+
+      inspect(d, false, null).should.equal(
+        `Map(2) {
   1234567890123456789012345678901234567890n => [ Map(3) { 'a' => 1, 2 => 'b', 'c' => 3 }, Set(3) { 'a', 2, 'c' } ],
   2000-01-01T19:04:05.678Z => [ Set(3) { 'd', 5, 'f' }, Map(3) { 'd' => 4, 5 => 'e', 'f' => 6 } ]
-}`);
+}`
+      );
     });
 
     it('custom', () => {
