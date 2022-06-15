@@ -29,6 +29,11 @@ const serifyNode = (value, options) => {
   const descriptors = Object.getOwnPropertyDescriptors(value);
   for (const p in value) {
     if (descriptors[p].writable) value[p] = serifyNode(value[p], options);
+    else if (descriptors[p].configurable) {
+      Object.defineProperty(value, p, { writable: true });
+      value[p] = serifyNode(value[p], options);
+      Object.defineProperty(value, p, { writable: false });
+    }
   }
   return value;
 };
@@ -60,8 +65,14 @@ const deserifyNode = (value, options = {}) => {
   }
 
   const descriptors = Object.getOwnPropertyDescriptors(value);
-  for (const p in value)
+  for (const p in value) {
     if (descriptors[p].writable) value[p] = deserifyNode(value[p], options);
+    else if (descriptors[p].configurable) {
+      Object.defineProperty(value, p, { writable: true });
+      value[p] = deserifyNode(value[p], options);
+      Object.defineProperty(value, p, { writable: false });
+    }
+  }
 
   return value;
 };
