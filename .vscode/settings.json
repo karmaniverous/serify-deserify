@@ -1,17 +1,18 @@
 {
-	"git.autofetch": true,
-	"diffEditor.ignoreTrimWhitespace": false,
-	"javascript.updateImportsOnFileMove.enabled": "always",
-	"git.enableSmartCommit": true,
-	"[javascript]": {
-		"editor.defaultFormatter": "esbenp.prettier-vscode"
-	},
-	"editor.formatOnSave": true,
-	"prettier.useTabs": false,
-	"prettier.singleQuote": true,
-	"editor.tabSize": 2,
-	"editor.formatOnPaste": true,
-	"editor.defaultFormatter": "esbenp.prettier-vscode",
-	"prettier.proseWrap": "always",
-	"editor.accessibilitySupport": "off"
+  "git.autofetch": true,
+  "diffEditor.ignoreTrimWhitespace": false,
+  "javascript.updateImportsOnFileMove.enabled": "always",
+  "git.enableSmartCommit": true,
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "editor.formatOnSave": true,
+  "prettier.useTabs": false,
+  "prettier.singleQuote": true,
+  "editor.tabSize": 2,
+  "editor.formatOnPaste": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "prettier.proseWrap": "always",
+  "editor.accessibilitySupport": "off",
+  "javascript.preferences.importModuleSpecifierEnding": "minimal"
 }
