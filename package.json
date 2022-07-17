@@ -1,57 +1,69 @@
 {
-	"name": "@karmaniverous/serify-deserify",
-	"version": "1.2.8",
-	"description": "Reversibly transform unserializable values into serializable ones.",
-	"main": "lib/index.js",
-	"scripts": {
-		"build": "babel src -d lib",
-		"test": "mocha './{,!(node_modules)/**}/*.test.*js'"
-	},
-	"repository": {
-		"type": "git",
-		"url": "git+https://github.com/karmaniverous/serify-deserify.git"
-	},
-	"keywords": [
-		"bigint",
-		"deserialize",
-		"date",
-		"json",
-		"map",
-		"parse",
-		"redux",
-		"serialize",
-		"serializable",
-		"set",
-		"state",
-		"stringify",
-		"type"
-	],
-	"author": "Jason G. Williscroft",
-	"license": "ISC",
-	"bugs": {
-		"url": "https://github.com/karmaniverous/serify-deserify/issues"
-	},
-	"homepage": "https://github.com/karmaniverous/serify-deserify#readme",
-	"devDependencies": {
-		"@babel/cli": "^7.17.10",
-		"@babel/core": "^7.18.2",
-		"@babel/eslint-parser": "^7.18.2",
-		"@babel/preset-env": "^7.18.2",
-		"@reduxjs/toolkit": "^1.8.2",
-		"babel-plugin-module-extension": "^0.1.3",
-		"chai": "^4.3.6",
-		"eslint": "^8.17.0",
-		"eslint-config-standard": "^17.0.0",
-		"eslint-plugin-import": "^2.26.0",
-		"eslint-plugin-mocha": "^10.0.5",
-		"eslint-plugin-node": "^11.1.0",
-		"mocha": "^10.0.0",
-		"prettier": "^2.6.2"
-	},
-	"mocha": {
-		"spec": "./{,!(node_modules)/**}/*.test.*js"
-	},
-	"dependencies": {
-		"is-what": "^4.1.7"
-	}
+  "name": "@karmaniverous/serify-deserify",
+  "version": "1.2.8",
+  "description": "Reversibly transform unserializable values into serializable ones.",
+  "main": "lib/index.js",
+  "scripts": {
+    "build": "babel src -d lib",
+    "release": "dotenv -c development -- release-it",
+    "test": "mocha './{,!(node_modules)/**}/*.test.*js'"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/karmaniverous/serify-deserify.git"
+  },
+  "keywords": [
+    "bigint",
+    "deserialize",
+    "date",
+    "json",
+    "map",
+    "parse",
+    "redux",
+    "serialize",
+    "serializable",
+    "set",
+    "state",
+    "stringify",
+    "type"
+  ],
+  "author": "Jason G. Williscroft",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/karmaniverous/serify-deserify/issues"
+  },
+  "homepage": "https://github.com/karmaniverous/serify-deserify#readme",
+  "devDependencies": {
+    "@babel/cli": "^7.17.10",
+    "@babel/core": "^7.18.2",
+    "@babel/eslint-parser": "^7.18.2",
+    "@babel/preset-env": "^7.18.2",
+    "@reduxjs/toolkit": "^1.8.2",
+    "babel-plugin-module-extension": "^0.1.3",
+    "chai": "^4.3.6",
+    "dotenv-cli": "^6.0.0",
+    "eslint": "^8.17.0",
+    "eslint-config-standard": "^17.0.0",
+    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-mocha": "^10.0.5",
+    "eslint-plugin-node": "^11.1.0",
+    "mocha": "^10.0.0",
+    "prettier": "^2.6.2",
+    "release-it": "^15.1.2"
+  },
+  "mocha": {
+    "spec": "./{,!(node_modules)/**}/*.test.*js"
+  },
+  "dependencies": {
+    "is-what": "^4.1.7"
+  },
+  "release-it": {
+    "github": {
+      "release": true,
+      "update": true
+    },
+    "npm": {
+      "publish": true
+    }
+  }
 }
