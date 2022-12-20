@@ -31,9 +31,10 @@ To install the package, run this command:
 npm install @karmaniverous/serify-deserify
 ```
 
-Review the
-[unit tests](https://github.com/karmaniverous/serify-deserify/blob/main/src/index.test.mjs)
-for simple examples of how to use `serify` and `deserify`.
+Review the unit tests for simple examples of how to use
+[`serify`](https://github.com/karmaniverous/serify-deserify/blob/main/src/export/serify/serify.test.mjs)
+and
+[`deserify`](https://github.com/karmaniverous/serify-deserify/blob/main/src/export/deserify/deserify.test.mjs).
 
 [Click here](https://github.com/karmaniverous/serify-deserify/blob/main/example/redux.mjs)
 for a fully worked out example using the Redux middleware.
