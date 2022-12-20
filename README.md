@@ -112,6 +112,12 @@ for a fully worked out example using the Redux middleware.
 ## Typedefs
 
 <dl>
+<dt><a href="#serifierCallback">serifierCallback</a> ⇒ <code>*</code></dt>
+<dd><p>callback to serify a custom type.</p>
+</dd>
+<dt><a href="#deserifierCallback">deserifierCallback</a> ⇒ <code>*</code></dt>
+<dd><p>callback to deserify a custom type.</p>
+</dd>
 <dt><a href="#OptionsType">OptionsType</a> : <code>Object</code></dt>
 <dd><p>serify-deserify options type</p>
 </dd>
@@ -161,6 +167,30 @@ serify a value
 | [value] | <code>\*</code> | value to be serified |
 | [options] | [<code>Options</code>](#Options) | options object |
 
+<a name="serifierCallback"></a>
+
+## serifierCallback ⇒ <code>\*</code>
+callback to serify a custom type.
+
+**Kind**: global typedef  
+**Returns**: <code>\*</code> - serified value  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| value | <code>\*</code> | unserified value |
+
+<a name="deserifierCallback"></a>
+
+## deserifierCallback ⇒ <code>\*</code>
+callback to deserify a custom type.
+
+**Kind**: global typedef  
+**Returns**: <code>\*</code> - unserified value  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| value | <code>\*</code> | serified value |
+
 <a name="OptionsType"></a>
 
 ## OptionsType : <code>Object</code>
@@ -171,8 +201,8 @@ serify-deserify options type
 
 | Name | Type | Description |
 | --- | --- | --- |
-| serifier | <code>function</code> | serifier callback |
-| deserifier | <code>function</code> | deserifier callback |
+| serifier | [<code>serifierCallback</code>](#serifierCallback) | serifier callback |
+| deserifier | [<code>deserifierCallback</code>](#deserifierCallback) | deserifier callback |
 
 <a name="OptionsTypes"></a>
 
