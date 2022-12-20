@@ -3,7 +3,6 @@
     "dbaeumer.vscode-eslint",
     "shyykoserhiy.git-autoconfig",
     "hbenl.vscode-mocha-test-adapter",
-    "esbenp.prettier-vscode",
-    "eamodio.gitlens"
+    "esbenp.prettier-vscode"
   ]
 }

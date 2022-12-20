@@ -16,7 +16,7 @@ const serifyOptions = {
 };
 
 // Generate a serify Redux middleware.
-import { createReduxMiddleware, deserify } from '../src/index.mjs'; // '@karmaniverous/serify-deserify';
+import { createReduxMiddleware, deserify } from '../src/export'; // '@karmaniverous/serify-deserify';
 const serifyMiddleware = createReduxMiddleware(serifyOptions);
 
 // Import Redux Toolkit.
