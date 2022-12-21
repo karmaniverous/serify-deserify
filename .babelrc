@@ -2,9 +2,12 @@
   "ignore": [
     "**/*.test.cjs",
     "**/*.test.js",
-    "**/*.test.jsx",
     "**/*.test.mjs",
-    "**/*.test.ts"
+    "**/*.test.ts",
+    "**/test/*.cjs",
+    "**/test/*.js",
+    "**/test/*.mjs",
+    "**/test/*.ts"
   ],
   "presets": ["@babel/preset-env"],
   "plugins": [
