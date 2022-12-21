@@ -1,3 +1,7 @@
+// *************************************************************
+// Run this from your command line with 'node example/redux.js'.
+// *************************************************************
+
 // Let's create a custom class to send to our Redux store.
 class Custom {
   constructor(p) {
@@ -23,10 +27,8 @@ import {
 const serifyMiddleware = createReduxMiddleware(serifyOptions);
 
 // Import Redux Toolkit.
-// The import weirdness is only required to support Babel!
-import * as toolkitRaw from '@reduxjs/toolkit';
-const { combineReducers, configureStore, createSlice } =
-  toolkitRaw.default ?? toolkitRaw;
+import rtk from '@reduxjs/toolkit';
+const { combineReducers, configureStore, createSlice } = rtk;
 
 // Construct a Redux slice.
 const testSlice = createSlice({
