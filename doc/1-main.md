@@ -32,11 +32,11 @@ npm install @karmaniverous/serify-deserify
 ```
 
 Review the unit tests for simple examples of how to use
-[`serify`](https://github.com/karmaniverous/serify-deserify/blob/main/src/export/serify/serify.test.mjs)
+[`serify`](https://github.com/karmaniverous/serify-deserify/blob/main/lib/serify/serify.test.js)
 and
-[`deserify`](https://github.com/karmaniverous/serify-deserify/blob/main/src/export/deserify/deserify.test.mjs).
+[`deserify`](https://github.com/karmaniverous/serify-deserify/blob/main/lib/deserify/deserify.test.js).
 
-[Click here](https://github.com/karmaniverous/serify-deserify/blob/main/example/redux.mjs)
+[Click here](https://github.com/karmaniverous/serify-deserify/blob/main/example/redux.js)
 for a fully worked out example using the Redux middleware.
 
 ## Serifiable Types
@@ -54,7 +54,7 @@ A _serifiable type_ is any type that is:
 
 To create a new serifiable type or to modify the behavior or an existing one,
 just pass in an `options` object that follows the
-[default options](https://github.com/karmaniverous/serify-deserify/blob/main/src/options/defaultOptions.mjs)
+[default options](https://github.com/karmaniverous/serify-deserify/blob/main/lib/options/defaultOptions.js)
 pattern.
 
 ## serifyKey
@@ -90,5 +90,5 @@ wrap your selectors in the `deserify` function.
 `createReduxMiddleware` will work anyplace Redux is used, but
 [we're all supposed to be using Redux Toolkit now](https://redux-toolkit.js.org/introduction/getting-started#purpose).
 
-[Click here](https://github.com/karmaniverous/serify-deserify/blob/main/example/redux.mjs)
+[Click here](https://github.com/karmaniverous/serify-deserify/blob/main/example/redux.js)
 for a fully worked out example using the Redux middleware.
