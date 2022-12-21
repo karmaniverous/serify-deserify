@@ -44,7 +44,6 @@
     "@types/node": "^18.11.17",
     "babel-plugin-lodash": "^3.3.4",
     "babel-plugin-module-extension": "^0.1.3",
-    "babel-plugin-transform-inline-environment-variables": "^0.4.4",
     "chai": "^4.3.7",
     "concat-md": "^0.5.0",
     "dotenv-cli": "^6.0.0",
@@ -54,13 +53,17 @@
     "jsdoc-to-markdown": "^8.0.0",
     "mocha": "^10.2.0",
     "prettier": "^2.8.1",
-    "release-it": "^15.5.1",
-    "rimraf": "^3.0.2"
+    "release-it": "^15.5.1"
   },
-  "main": "lib/export/index.js",
+  "exports": {
+    ".": {
+      "import": "./lib/index.js",
+      "require": "./dist/default/lib/index.js"
+    }
+  },
   "mocha": {
     "exclude": [
-      "./lib/**",
+      "./dist/**",
       "./node_modules/**"
     ],
     "require": [
@@ -77,11 +80,12 @@
     }
   },
   "scripts": {
-    "lint": "eslint src/**",
+    "lint": "eslint lib/**",
     "test": "mocha",
-    "build": "rimraf ./lib && babel src -d lib --config-file ./babel.build.js",
-    "doc": "jsdoc2md -c doc/jsdoc.config.json -f src/**/*.* -t doc/api-template.hbs > doc/3-api.md && concat-md doc --hide-anchor-links > README.md",
+    "build": "babel lib -d dist/default/lib --delete-dir-on-start --config-file ./dist/default/.babelrc",
+    "doc": "jsdoc2md -c doc/jsdoc.config.json -f lib/**/*.* -t doc/api-template.hbs > doc/3-api.md && concat-md doc --hide-anchor-links > README.md",
     "package": "npm run lint && npm run test && npm run build && npm run doc",
     "release": "npm run package && dotenv -c -- release-it"
-  }
+  },
+  "type": "module"
 }

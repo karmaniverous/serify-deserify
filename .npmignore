@@ -1,8 +1,7 @@
 .vscode/
 doc/
-src/
 test/
 .eslintrc.*
-babel.*.js
-*.local
-*.local.template
+.babelrc.*
+*.local.*
+*.test.*
