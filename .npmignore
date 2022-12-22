@@ -1,7 +1,23 @@
+# project settings
 .vscode/
-doc/
-test/
-.eslintrc.*
+
+# babel settings
+.babelrc
 .babelrc.*
-*.local.*
+babel.config.*
+
+# doc source
+doc/
+
+# eslint settings
+.eslintrc.*
+
+# local secrets
+*.local
+
+# templates
+*.template
+
+# test files
+**/test/
 *.test.*
