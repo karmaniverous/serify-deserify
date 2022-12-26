@@ -12,6 +12,9 @@ doc/
 # eslint settings
 .eslintrc.*
 
+# example files
+example/
+
 # local secrets
 *.local
 

@@ -12,7 +12,7 @@
   "bugs": {
     "url": "https://github.com/karmaniverous/serify-deserify/issues"
   },
-  "description": "Reversibly transform unserializable values into serializable ones.",
+  "description": "Reversibly transform unserializable values into serializable ones. Includes Redux middleware.",
   "homepage": "https://github.com/karmaniverous/serify-deserify#readme",
   "keywords": [
     "bigint",
