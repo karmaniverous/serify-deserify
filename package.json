@@ -31,7 +31,8 @@
   ],
   "license": "BSD-3-Clause",
   "dependencies": {
-    "is-what": "^4.1.7"
+    "is-what": "^4.1.7",
+    "pkg-dir": "^7.0.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.19.3",

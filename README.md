@@ -95,13 +95,6 @@ for a fully worked out example using the Redux middleware.
 
 # API Documentation
 
-## Constants
-
-<dl>
-<dt><a href="#PACKAGE_INFO">PACKAGE_INFO</a> : <code><a href="#PackageInfo">PackageInfo</a></code></dt>
-<dd></dd>
-</dl>
-
 ## Functions
 
 <dl>
@@ -134,14 +127,8 @@ for a fully worked out example using the Redux middleware.
 <dt><a href="#Options">Options</a> : <code>Object</code></dt>
 <dd><p>serify-deserify options object</p>
 </dd>
-<dt><a href="#PackageInfo">PackageInfo</a> : <code>Object</code></dt>
-<dd></dd>
 </dl>
 
-<a name="PACKAGE_INFO"></a>
-
-## PACKAGE\_INFO : [<code>PackageInfo</code>](#PackageInfo)
-**Kind**: global constant  
 <a name="createReduxMiddleware"></a>
 
 ## createReduxMiddleware([options]) ⇒ <code>function</code>
@@ -241,16 +228,6 @@ serify-deserify options object
 | --- | --- | --- |
 | [serifyKey] | <code>string</code> | serify key |
 | types | [<code>OptionsTypes</code>](#OptionsTypes) | types object |
-
-<a name="PackageInfo"></a>
-
-## PackageInfo : <code>Object</code>
-**Kind**: global typedef  
-**Properties**
-
-| Name | Type | Description |
-| --- | --- | --- |
-| version | <code>string</code> | package version |
 
 
 ---
