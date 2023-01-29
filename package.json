@@ -62,6 +62,7 @@
       "require": "./dist/default/lib/index.js"
     }
   },
+  "main": "./lib/index.js",
   "mocha": {
     "exclude": [
       "./dist/**",
