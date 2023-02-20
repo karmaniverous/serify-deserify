@@ -49,8 +49,8 @@ A _serifiable type_ is any type that is:
   numbers, strings, plain objects, and arrays
 - natively supported by `serify`, i.e. `BigInt`, `Date`, `Map`, and `Set`
 - added to `serify` as a custom type
-- composed exclusively of any of the above, i.e. arrays of BigInt-keyed Maps of
-  objects containing Sets of custom class instances
+- composed exclusively of any of the above (e.g. an array of BigInt-keyed Maps
+  of objects containing Sets of custom class instances).
 
 To create a new serifiable type or to modify the behavior or an existing one,
 just pass in an `options` object that follows the
