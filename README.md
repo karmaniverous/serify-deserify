@@ -118,6 +118,9 @@ for a fully worked out example using the Redux middleware.
 <dt><a href="#deserifierCallback">deserifierCallback</a> ⇒ <code>*</code></dt>
 <dd><p>callback to deserify a custom type.</p>
 </dd>
+<dt><a href="#serifyKey">serifyKey</a> ⇒ <code>symbol</code></dt>
+<dd><p>static property name to override an object's serify key</p>
+</dd>
 <dt><a href="#OptionsType">OptionsType</a> : <code>Object</code></dt>
 <dd><p>serify-deserify options type</p>
 </dd>
@@ -190,6 +193,13 @@ callback to deserify a custom type.
 | Param | Type | Description |
 | --- | --- | --- |
 | value | <code>\*</code> | serified value |
+
+<a name="serifyKey"></a>
+
+## serifyKey => <code>symbol</code>
+static property name to override an object's serify key
+
+**Kind**: symbol
 
 <a name="OptionsType"></a>
 
