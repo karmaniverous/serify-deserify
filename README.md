@@ -95,6 +95,14 @@ for a fully worked out example using the Redux middleware.
 
 # API Documentation
 
+## Constants
+
+<dl>
+<dt><a href="#serifyKey">serifyKey</a></dt>
+<dd><p>static property name to override an object&#39;s serify key</p>
+</dd>
+</dl>
+
 ## Functions
 
 <dl>
@@ -129,6 +137,12 @@ for a fully worked out example using the Redux middleware.
 </dd>
 </dl>
 
+<a name="serifyKey"></a>
+
+## serifyKey
+static property name to override an object's serify key
+
+**Kind**: global constant  
 <a name="createReduxMiddleware"></a>
 
 ## createReduxMiddleware([options]) ⇒ <code>function</code>
