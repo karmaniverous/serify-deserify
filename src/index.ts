@@ -2,3 +2,4 @@ export { createReduxMiddleware } from './createReduxMiddleware/createReduxMiddle
 export { deserify } from './deserify/deserify';
 export { defaultOptions, type DefaultTypeMap } from './options/defaultOptions';
 export { serify, staticTypeProperty } from './serify/serify';
+export type { SerifiableTypeMap, SerifyOptions } from './types';

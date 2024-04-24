@@ -1,5 +1,4 @@
-import { defaultOptions, type DefaultTypeMap } from '../options/defaultOptions';
-import { type SerifyOptions } from '../types';
+import { defaultOptions, type DefaultTypeMap, type SerifyOptions } from '../';
 
 export class Custom {
   constructor(public p: number) {}

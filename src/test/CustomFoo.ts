@@ -1,10 +1,9 @@
 import {
   defaultOptions,
   type DefaultTypeMap,
-} from '../options/defaultOptions.js';
-import { staticTypeProperty } from '../serify/serify.js';
-import { type SerifyOptions } from '../types.js';
-import { Custom } from './Custom.js';
+  type SerifyOptions,
+  staticTypeProperty,
+} from '../';
 
 export class CustomFoo {
   static [staticTypeProperty] = 'Foo';
@@ -22,7 +21,7 @@ export const customFooOptions: SerifyOptions<CustomFooTypeMap> = {
     ...defaultOptions.types,
     Foo: {
       serifier: (value) => value.p,
-      deserifier: (value) => new Custom(value),
+      deserifier: (value) => new CustomFoo(value),
     },
   },
 };
