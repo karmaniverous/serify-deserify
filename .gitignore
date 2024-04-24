@@ -1,2 +1,5 @@
-node_modules
-*.local
+.nyc_output/
+coverage/
+dist/
+esm/
+node_modules/

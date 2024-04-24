@@ -1,0 +1,21 @@
+{
+  "exclude": [
+    "./dist/**",
+    "./node_modules/**",
+    "./**/*.json"
+  ],
+  "extension": [
+    "ts"
+  ],
+  "node-option": [
+    "experimental-specifier-resolution=node",
+    "loader=ts-node/esm",
+    "no-warnings"
+  ],
+  "recursive": true,
+  "require": [
+    "jsdom-global",
+    "source-map-support"
+  ],
+  "spec": "./**/*.test.!(*.*)"
+}
