@@ -1,11 +1,11 @@
 import { defaultOptions, type DefaultTypeMap, type SerifyOptions } from '../';
 
 export class Custom {
-  constructor(public p: number) {}
+  constructor(public p: bigint) {}
 }
 
 export interface CustomTypeMap extends DefaultTypeMap {
-  Custom: [Custom, number];
+  Custom: [Custom, bigint];
 }
 
 export const customOptions: SerifyOptions<CustomTypeMap> = {

@@ -2,17 +2,17 @@ import {
   defaultOptions,
   type DefaultTypeMap,
   type SerifyOptions,
-  staticTypeProperty,
+  serifyStaticTypeProperty,
 } from '../';
 
 export class CustomFoo {
-  static [staticTypeProperty] = 'Foo';
+  static [serifyStaticTypeProperty] = 'Foo';
 
-  constructor(public p: number) {}
+  constructor(public p: bigint) {}
 }
 
 export interface CustomFooTypeMap extends DefaultTypeMap {
-  Foo: [CustomFoo, number];
+  Foo: [CustomFoo, bigint];
 }
 
 export const customFooOptions: SerifyOptions<CustomFooTypeMap> = {

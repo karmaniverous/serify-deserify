@@ -1,8 +1,12 @@
 {
+  "[markdown]": {
+    "editor.wordWrap": "bounded"
+  },
   "diffEditor.ignoreTrimWhitespace": false,
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.formatOnPaste": true,
   "editor.formatOnSave": true,
+  "eslint.experimental.useFlatConfig": true,
   "git.autofetch": true,
   "git.enableSmartCommit": true,
   "javascript.preferences.importModuleSpecifierEnding": "minimal",
@@ -12,7 +16,5 @@
     "--no-warnings=ExperimentalWarning",
     "--experimental-specifier-resolution=node"
   ],
-  "testExplorer.mergeSuites": true,
-  "eslint.experimental.useFlatConfig": true
+  "testExplorer.mergeSuites": true
 }
-

@@ -232,25 +232,33 @@ describe('serify', function () {
     });
 
     it('custom', function () {
-      const v = new Custom(42);
+      const v = new Custom(42n);
 
       const s = serify(v, customOptions);
 
-      expect(s).to.deep.equal({ serifyKey: null, type: 'Custom', value: 42 });
+      expect(s).to.deep.equal({
+        serifyKey: null,
+        type: 'Custom',
+        value: { serifyKey: null, type: 'BigInt', value: '42' },
+      });
     });
 
     it('custom with key', function () {
-      const v = new CustomFoo(42);
+      const v = new CustomFoo(42n);
 
       const s = serify(v, customFooOptions);
 
-      expect(s).to.deep.equal({ serifyKey: null, type: 'Foo', value: 42 });
+      expect(s).to.deep.equal({
+        serifyKey: null,
+        type: 'Foo',
+        value: { serifyKey: null, type: 'BigInt', value: '42' },
+      });
     });
   });
 
   describe('errors', function () {
     it('invalid serifier', function () {
-      const v = new Custom(42);
+      const v = new Custom(42n);
 
       expect(() => serify(v, defaultOptions)).to.throw(
         Error,

@@ -193,21 +193,33 @@ describe('deserify', function () {
     });
 
     it('custom', function () {
-      const v = { serifyKey: null, type: 'Custom', value: 42 };
+      const v = {
+        serifyKey: null,
+        type: 'Custom',
+        value: { serifyKey: null, type: 'BigInt', value: '42' },
+      };
 
       const d = deserify(v, customOptions);
 
       console.log(inspect(d, false, null));
 
-      expect(inspect(d, false, null)).to.equal(`Custom { p: 42 }`);
+      expect(inspect(d, false, null)).to.equal(`Custom { p: 42n }`);
     });
 
     it('unmatched serifyKey', function () {
-      const v = { serifyKey: 42, type: 'Custom', value: 42 };
+      const v = {
+        serifyKey: 42,
+        type: 'Custom',
+        value: { serifyKey: null, type: 'BigInt', value: '42' },
+      };
 
       const d = deserify(v, customOptions);
 
-      expect(d).to.deep.equal({ serifyKey: 42, type: 'Custom', value: 42 });
+      expect(d).to.deep.equal({
+        serifyKey: 42,
+        type: 'Custom',
+        value: 42n,
+      });
     });
 
     it('unsupported type', function () {

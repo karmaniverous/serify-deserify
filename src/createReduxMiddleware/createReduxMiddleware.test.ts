@@ -205,7 +205,7 @@ describe('redux', function () {
     });
 
     it('custom', function () {
-      const v = new Custom(42);
+      const v = new Custom(42n);
 
       const s = bounceValue(v);
 

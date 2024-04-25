@@ -8,11 +8,9 @@ import {
 } from '../types';
 
 /**
- * static property name to override an object's serify key
+ * static property name to override an type's key in serify config
  */
-export const staticTypeProperty = Symbol(
-  'serify-deserify static type property',
-);
+export const serifyStaticTypeProperty = Symbol('serify static type property');
 
 /**
  * serify a value
@@ -24,8 +22,8 @@ export const serify = <M extends SerifiableTypeMap = DefaultTypeMap>(
   if (isSerializablePrimitive(value)) return value;
 
   const valueType = isAnyObject(value)
-    ? staticTypeProperty in value.constructor
-      ? (value.constructor[staticTypeProperty] as string)
+    ? serifyStaticTypeProperty in value.constructor
+      ? (value.constructor[serifyStaticTypeProperty] as string)
       : value.constructor.name
     : getType(value);
 
