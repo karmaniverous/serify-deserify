@@ -2,7 +2,11 @@
 
 **deserify** - do the exact opposite
 
-> <font color="darkRed">**BREAKING CHANGE:** The v2.0.0 release is a complete TypeScript refactor. The API now requires you to import & extend the [`defaultOptions`](./src/options/defaultOptions.ts) object to create custom types. See the [Options section](#options) for more info!</font>
+---
+
+**_BREAKING CHANGE:_** _The v2.0.0 release is a complete TypeScript refactor. The API now requires you to import & extend the [`defaultOptions`](./src/options/defaultOptions.ts) object to create custom types. See the [Options section](#options) for more info!_
+
+---
 
 ## Why?
 
