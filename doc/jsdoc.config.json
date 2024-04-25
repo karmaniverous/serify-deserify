@@ -1,5 +1,0 @@
-{
-  "source": {
-    "includePattern": ".+(?<!\\.test)\\.(cjs|js|jsx|mjs)$"
-  }
-}

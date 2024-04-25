@@ -1,18 +1,20 @@
 {
-  "git.autofetch": true,
-  "diffEditor.ignoreTrimWhitespace": false,
-  "javascript.updateImportsOnFileMove.enabled": "always",
-  "git.enableSmartCommit": true,
-  "[javascript]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  "[markdown]": {
+    "editor.wordWrap": "bounded"
   },
-  "editor.formatOnSave": true,
-  "prettier.useTabs": false,
-  "prettier.singleQuote": true,
-  "editor.tabSize": 2,
-  "editor.formatOnPaste": true,
+  "diffEditor.ignoreTrimWhitespace": false,
   "editor.defaultFormatter": "esbenp.prettier-vscode",
-  "prettier.proseWrap": "always",
-  "editor.accessibilitySupport": "off",
-  "javascript.preferences.importModuleSpecifierEnding": "minimal"
+  "editor.formatOnPaste": true,
+  "editor.formatOnSave": true,
+  "eslint.experimental.useFlatConfig": true,
+  "git.autofetch": true,
+  "git.enableSmartCommit": true,
+  "javascript.preferences.importModuleSpecifierEnding": "minimal",
+  "javascript.updateImportsOnFileMove.enabled": "always",
+  "mochaExplorer.nodeArgv": [
+    "--loader=ts-node/esm",
+    "--no-warnings=ExperimentalWarning",
+    "--experimental-specifier-resolution=node"
+  ],
+  "testExplorer.mergeSuites": true
 }

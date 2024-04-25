@@ -1,8 +1,7 @@
 {
   "recommendations": [
     "dbaeumer.vscode-eslint",
-    "shyykoserhiy.git-autoconfig",
-    "hbenl.vscode-mocha-test-adapter",
-    "esbenp.prettier-vscode"
+    "esbenp.prettier-vscode",
+    "hbenl.vscode-mocha-test-adapter"
   ]
 }

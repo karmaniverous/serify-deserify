@@ -1,0 +1,19 @@
+
+#!/bin/sh
+
+BRANCH=$(git rev-parse --abbrev-ref HEAD)
+REGEX="^(head|main|(bugfix|chore|docs|feature|hotfix)\/[-_a-zA-Z0-9]+|release\/[0-9]+\.[0-9]+\.[0-9]+)(-[_a-zA-Z0-9]+)?$"
+
+if ! [[ $BRANCH =~ $REGEX ]]; then
+  echo "$BRANCH"
+  echo ""
+  echo "Invalid branch name. Valid patterns:"
+  echo "- main"
+  echo "- bugfix/[-_a-zA-Z0-9]+"
+  echo "- chore/[-_a-zA-Z0-9]+"
+  echo "- docs/[-_a-zA-Z0-9]+"
+  echo "- feature/[-_a-zA-Z0-9]+"
+  echo "- hotfix/[-_a-zA-Z0-9]+"
+  echo "- release/{semantic version}"
+  exit 1
+fi

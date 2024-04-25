@@ -1,18 +1,62 @@
 {
-  "name": "@karmaniverous/serify-deserify",
-  "version": "1.4.0",
-  "publishConfig": {
-    "access": "public"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/karmaniverous/serify-deserify.git"
-  },
   "author": "Jason G. Williscroft",
   "bugs": {
     "url": "https://github.com/karmaniverous/serify-deserify/issues"
   },
+  "dependencies": {
+    "is-what": "^4.1.16",
+    "tslog": "^4.9.2"
+  },
   "description": "Reversibly transform unserializable values into serializable ones. Includes Redux middleware.",
+  "devDependencies": {
+    "@eslint/js": "^9.1.1",
+    "@reduxjs/toolkit": "^2.2.3",
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "@rollup/plugin-terser": "^0.4.4",
+    "@rollup/plugin-typescript": "^11.1.6",
+    "@types/chai": "^4.3.14",
+    "@types/eslint__js": "^8.42.3",
+    "@types/eslint-config-prettier": "^6.11.3",
+    "@types/eslint-plugin-mocha": "^10.4.0",
+    "@types/mocha": "^10.0.6",
+    "@types/node": "^20.12.7",
+    "auto-changelog": "^2.4.0",
+    "chai": "^5.1.0",
+    "cross-env": "^7.0.3",
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-mocha": "^10.4.3",
+    "eslint-plugin-simple-import-sort": "^12.1.0",
+    "jsdom-global": "^3.0.2",
+    "lefthook": "^1.6.10",
+    "mocha": "^10.4.0",
+    "nyc": "^15.1.0",
+    "prettier": "^3.2.5",
+    "release-it": "^17.2.0",
+    "rimraf": "^5.0.5",
+    "rollup": "^4.16.4",
+    "rollup-plugin-dts": "^6.1.0",
+    "source-map-support": "^0.5.21",
+    "ts-node": "^10.9.2",
+    "tslib": "^2.6.2",
+    "typescript": "^5.4.5",
+    "typescript-eslint": "^7.7.1"
+  },
+  "exports": {
+    ".": {
+      "import": {
+        "default": "./dist/index.mjs",
+        "types": "./dist/index.d.mts"
+      },
+      "require": {
+        "default": "./dist/index.cjs",
+        "types": "./dist/index.d.cts"
+      }
+    }
+  },
+  "files": [
+    "dist"
+  ],
   "homepage": "https://github.com/karmaniverous/serify-deserify#readme",
   "keywords": [
     "bigint",
@@ -27,66 +71,52 @@
     "set",
     "state",
     "stringify",
-    "type"
+    "typescript"
   ],
   "license": "BSD-3-Clause",
-  "dependencies": {
-    "is-what": "^4.1.16"
-  },
-  "devDependencies": {
-    "@babel/cli": "^7.23.4",
-    "@babel/core": "^7.23.6",
-    "@babel/eslint-parser": "^7.23.3",
-    "@babel/plugin-syntax-import-assertions": "^7.23.3",
-    "@babel/preset-env": "^7.23.6",
-    "@babel/register": "^7.22.15",
-    "@karmaniverous/get-dotenv": "^3.1.17",
-    "@reduxjs/toolkit": "^2.0.1",
-    "@types/node": "^20.10.4",
-    "babel-plugin-lodash": "^3.3.4",
-    "babel-plugin-module-extension": "^0.1.3",
-    "chai": "^4.3.10",
-    "concat-md": "^0.5.1",
-    "eslint": "^8.55.0",
-    "eslint-config-standard": "^17.1.0",
-    "eslint-plugin-mocha": "^10.2.0",
-    "jsdoc-to-markdown": "^8.0.0",
-    "mocha": "^10.2.0",
-    "prettier": "^3.1.1",
-    "release-it": "^17.0.1"
-  },
-  "exports": {
-    ".": {
-      "import": "./lib/index.js",
-      "require": "./dist/default/lib/index.js"
-    }
-  },
-  "main": "./lib/index.js",
-  "mocha": {
-    "exclude": [
-      "./dist/**",
-      "./node_modules/**"
-    ],
-    "require": [
-      "@babel/register"
-    ],
-    "spec": "./**/*.test.!(*.*)"
+  "main": "dist/index.cjs",
+  "module": "dist/index.mjs",
+  "name": "@karmaniverous/serify-deserify",
+  "publishConfig": {
+    "access": "public"
   },
   "release-it": {
+    "git": {
+      "changelog": "npx auto-changelog --stdout --commit-limit false -u --template https://raw.githubusercontent.com/release-it/release-it/main/templates/changelog-compact.hbs",
+      "commitMessage": "chore: release v${version}",
+      "requireBranch": "main"
+    },
     "github": {
       "release": true
+    },
+    "hooks": {
+      "after:init": [
+        "npm run lint",
+        "npm run test",
+        "npm run build"
+      ],
+      "after:release": [
+        "git switch -c release/${version}",
+        "git push -u origin release/${version}",
+        "git switch main"
+      ]
     },
     "npm": {
       "publish": true
     }
   },
-  "scripts": {
-    "lint": "eslint lib/**",
-    "test": "mocha",
-    "build": "babel lib -d dist/default/lib --delete-dir-on-start --config-file ./dist/default/.babelrc",
-    "doc": "jsdoc2md -c doc/jsdoc.config.json -f lib/**/*.* -t doc/api-template.hbs > doc/2-api.jsdoc2.md && concat-md doc --hide-anchor-links > README.md",
-    "package": "npm run lint && npm run test && npm run build && npm run doc",
-    "release": "npm run package && getdotenv -- release-it"
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/karmaniverous/serify-deserify.git"
   },
-  "type": "module"
+  "scripts": {
+    "build": "rimraf dist && rollup --config rollup.config.ts --configPlugin @rollup/plugin-typescript",
+    "lint": "eslint src/** && prettier -c src",
+    "lint:fix": "eslint --fix src/** && prettier --write src",
+    "release": "release-it",
+    "test": "cross-env LOG_LEVEL=debug nyc mocha"
+  },
+  "type": "module",
+  "types": "dist/index.d.ts",
+  "version": "1.4.0"
 }
