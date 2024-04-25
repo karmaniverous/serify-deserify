@@ -1,10 +1,11 @@
 import { getType, isAnyObject, isArray, isPlainObject } from 'is-what';
 
+import { type DefaultTypeMap } from '../options/defaultOptions';
 import {
   isSerializablePrimitive,
   type SerifiableTypeMap,
   type SerifyOptions,
-} from '../types.js';
+} from '../types';
 
 /**
  * static property name to override an object's serify key
@@ -16,7 +17,7 @@ export const staticTypeProperty = Symbol(
 /**
  * serify a value
  */
-export const serify = <M extends SerifiableTypeMap>(
+export const serify = <M extends SerifiableTypeMap = DefaultTypeMap>(
   value: unknown,
   options: SerifyOptions<M>,
 ): unknown => {
@@ -32,14 +33,14 @@ export const serify = <M extends SerifiableTypeMap>(
     return {
       serifyKey: options.serifyKey,
       type: valueType,
-      value: serify<M>(options.types[valueType].serifier(value), options),
+      value: serify(options.types[valueType].serifier(value), options),
     };
 
-  if (isArray(value)) return value.map((v) => serify<M>(v, options));
+  if (isArray(value)) return value.map((v) => serify(v, options));
 
   if (isPlainObject(value)) {
     const copy: Record<string, unknown> = {};
-    for (const p in value) copy[p] = serify<M>(value[p], options);
+    for (const p in value) copy[p] = serify(value[p], options);
     return copy;
   }
 

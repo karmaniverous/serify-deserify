@@ -8,10 +8,10 @@ import type { SerifiableTypeMap, SerifyOptions } from '../types';
  * create redux middleware
  */
 export const createReduxMiddleware =
-  <M extends SerifiableTypeMap, R>(
+  <M extends SerifiableTypeMap>(
     options: SerifyOptions<M>,
     // eslint-disable-next-line @typescript-eslint/ban-types
-  ): Middleware<{}, R> =>
+  ): Middleware =>
   () =>
   (next) =>
   (action) => {

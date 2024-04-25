@@ -3,15 +3,15 @@
 import { expect } from 'chai';
 import { inspect } from 'util';
 
-import { defaultOptions, type DefaultTypeMap, deserify } from '../';
-import { customOptions, type CustomTypeMap } from '../test/Custom';
+import { defaultOptions, deserify } from '../';
+import { customOptions } from '../test/Custom';
 
 describe('deserify', function () {
   describe('serializable', function () {
     it('null', function () {
       const v = null;
 
-      const d = deserify<DefaultTypeMap>(v, defaultOptions);
+      const d = deserify(v, defaultOptions);
 
       expect(d).to.equal(v);
     });
@@ -19,7 +19,7 @@ describe('deserify', function () {
     it('bool', function () {
       const v = true;
 
-      const d = deserify<DefaultTypeMap>(v, defaultOptions);
+      const d = deserify(v, defaultOptions);
 
       expect(d).to.equal(v);
     });
@@ -27,7 +27,7 @@ describe('deserify', function () {
     it('number', function () {
       const v = 42;
 
-      const d = deserify<DefaultTypeMap>(v, defaultOptions);
+      const d = deserify(v, defaultOptions);
 
       expect(d).to.equal(v);
     });
@@ -35,7 +35,7 @@ describe('deserify', function () {
     it('string', function () {
       const v = 'tanstaafl';
 
-      const d = deserify<DefaultTypeMap>(v, defaultOptions);
+      const d = deserify(v, defaultOptions);
 
       expect(d).to.equal(v);
     });
@@ -43,7 +43,7 @@ describe('deserify', function () {
     it('object', function () {
       const v = { a: 1, b: 2, c: 3 };
 
-      const d = deserify<DefaultTypeMap>(v, defaultOptions);
+      const d = deserify(v, defaultOptions);
 
       expect(d).to.deep.equal(v);
     });
@@ -51,7 +51,7 @@ describe('deserify', function () {
     it('array', function () {
       const v = [true, 42, 'tanstaafl'];
 
-      const d = deserify<DefaultTypeMap>(v, defaultOptions);
+      const d = deserify(v, defaultOptions);
 
       expect(d).to.deep.equal(v);
     });
@@ -64,7 +64,7 @@ describe('deserify', function () {
         { a: 1, b: 2, c: 3, d: [false, -42, '!tanstaafl'] },
       ];
 
-      const d = deserify<DefaultTypeMap>(v, defaultOptions);
+      const d = deserify(v, defaultOptions);
 
       expect(d).to.deep.equal(v);
     });
@@ -78,7 +78,7 @@ describe('deserify', function () {
         value: '1234567890123456789012345678901234567890',
       };
 
-      const d = deserify<DefaultTypeMap>(v, defaultOptions);
+      const d = deserify(v, defaultOptions);
 
       expect(inspect(d, false, null)).to.equal(
         '1234567890123456789012345678901234567890n',
@@ -88,7 +88,7 @@ describe('deserify', function () {
     it('date', function () {
       const v = { serifyKey: null, type: 'Date', value: 946753445678 };
 
-      const d = deserify<DefaultTypeMap>(v, defaultOptions);
+      const d = deserify(v, defaultOptions);
 
       expect(inspect(d, false, null)).to.equal('2000-01-01T19:04:05.678Z');
     });
@@ -104,7 +104,7 @@ describe('deserify', function () {
         ],
       };
 
-      const d = deserify<DefaultTypeMap>(v, defaultOptions);
+      const d = deserify(v, defaultOptions);
 
       expect(inspect(d, false, null)).to.equal(
         `Map(3) { 'a' => 1, 2 => 'b', 'c' => 3 }`,
@@ -118,7 +118,7 @@ describe('deserify', function () {
         value: ['a', 2, 'c'],
       };
 
-      const d = deserify<DefaultTypeMap>(v, defaultOptions);
+      const d = deserify(v, defaultOptions);
 
       expect(inspect(d, false, null)).to.equal(`Set(3) { 'a', 2, 'c' }`);
     });
@@ -130,7 +130,7 @@ describe('deserify', function () {
         value: null,
       };
 
-      const d = deserify<DefaultTypeMap>(v, defaultOptions);
+      const d = deserify(v, defaultOptions);
 
       expect(d).to.equal(undefined);
     });
@@ -177,7 +177,7 @@ describe('deserify', function () {
         ],
       };
 
-      const d = deserify<DefaultTypeMap>(v, defaultOptions);
+      const d = deserify(v, defaultOptions);
 
       // console.log(inspect(d, false, null));
 
@@ -195,7 +195,7 @@ describe('deserify', function () {
     it('custom', function () {
       const v = { serifyKey: null, type: 'Custom', value: 42 };
 
-      const d = deserify<CustomTypeMap>(v, customOptions);
+      const d = deserify(v, customOptions);
 
       console.log(inspect(d, false, null));
 
@@ -205,7 +205,7 @@ describe('deserify', function () {
     it('unmatched serifyKey', function () {
       const v = { serifyKey: 42, type: 'Custom', value: 42 };
 
-      const d = deserify<CustomTypeMap>(v, customOptions);
+      const d = deserify(v, customOptions);
 
       expect(d).to.deep.equal({ serifyKey: 42, type: 'Custom', value: 42 });
     });
@@ -213,7 +213,7 @@ describe('deserify', function () {
     it('unsupported type', function () {
       const v = { serifyKey: null, type: 'CustomFoo', value: 42 };
 
-      const d = deserify<CustomTypeMap>(v, customOptions);
+      const d = deserify(v, customOptions);
 
       expect(d).to.deep.equal(v);
     });

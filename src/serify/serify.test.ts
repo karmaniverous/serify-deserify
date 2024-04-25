@@ -2,20 +2,16 @@
 
 import { expect } from 'chai';
 
-import { defaultOptions, type DefaultTypeMap, serify } from '../';
-import { Custom, customOptions, CustomTypeMap } from '../test/Custom';
-import {
-  CustomFoo,
-  customFooOptions,
-  CustomFooTypeMap,
-} from '../test/CustomFoo';
+import { defaultOptions, serify } from '../';
+import { Custom, customOptions } from '../test/Custom';
+import { CustomFoo, customFooOptions } from '../test/CustomFoo';
 
 describe('serify', function () {
   describe('serializable', function () {
     it('null', function () {
       const v = null;
 
-      const s = serify<DefaultTypeMap>(v, defaultOptions);
+      const s = serify(v, defaultOptions);
 
       expect(s).to.equal(v);
     });
@@ -23,7 +19,7 @@ describe('serify', function () {
     it('bool', function () {
       const v = true;
 
-      const s = serify<DefaultTypeMap>(v, defaultOptions);
+      const s = serify(v, defaultOptions);
 
       expect(s).to.equal(v);
     });
@@ -31,7 +27,7 @@ describe('serify', function () {
     it('number', function () {
       const v = 42;
 
-      const s = serify<DefaultTypeMap>(v, defaultOptions);
+      const s = serify(v, defaultOptions);
 
       expect(s).to.equal(v);
     });
@@ -39,7 +35,7 @@ describe('serify', function () {
     it('string', function () {
       const v = 'tanstaafl';
 
-      const s = serify<DefaultTypeMap>(v, defaultOptions);
+      const s = serify(v, defaultOptions);
 
       expect(s).to.equal(v);
     });
@@ -47,7 +43,7 @@ describe('serify', function () {
     it('object', function () {
       const v = { a: 1, b: 2, c: 3 };
 
-      const s = serify<DefaultTypeMap>(v, defaultOptions);
+      const s = serify(v, defaultOptions);
 
       expect(s).to.deep.equal(v);
     });
@@ -56,7 +52,7 @@ describe('serify', function () {
       const v = { a: 1, b: 2, c: { a: 1, b: 2, c: 3 } };
       Object.freeze(v.c);
 
-      const s = serify<DefaultTypeMap>(v, defaultOptions);
+      const s = serify(v, defaultOptions);
 
       expect(s).to.deep.equal(v);
     });
@@ -69,7 +65,7 @@ describe('serify', function () {
         writable: false,
       });
 
-      const s = serify<DefaultTypeMap>(v, defaultOptions);
+      const s = serify(v, defaultOptions);
 
       expect(s).to.deep.equal(v);
     });
@@ -77,7 +73,7 @@ describe('serify', function () {
     it('array', function () {
       const v = [true, 42, 'tanstaafl'];
 
-      const s = serify<DefaultTypeMap>(v, defaultOptions);
+      const s = serify(v, defaultOptions);
 
       expect(s).to.deep.equal(v);
     });
@@ -90,7 +86,7 @@ describe('serify', function () {
         { a: 1, b: 2, c: 3, d: [false, -42, '!tanstaafl'] },
       ];
 
-      const s = serify<DefaultTypeMap>(v, defaultOptions);
+      const s = serify(v, defaultOptions);
 
       expect(s).to.deep.equal(v);
     });
@@ -100,7 +96,7 @@ describe('serify', function () {
     it('bigint', function () {
       const v = 1234567890123456789012345678901234567890n;
 
-      const s = serify<DefaultTypeMap>(v, defaultOptions);
+      const s = serify(v, defaultOptions);
 
       expect(s).to.deep.equal({
         serifyKey: null,
@@ -112,7 +108,7 @@ describe('serify', function () {
     it('date', function () {
       const v = new Date('2000-01-02T03:04:05.678Z');
 
-      const s = serify<DefaultTypeMap>(v, defaultOptions);
+      const s = serify(v, defaultOptions);
 
       expect(s).to.deep.equal({
         serifyKey: null,
@@ -128,7 +124,7 @@ describe('serify', function () {
         ['c', 3],
       ]);
 
-      const s = serify<DefaultTypeMap>(v, defaultOptions);
+      const s = serify(v, defaultOptions);
 
       expect(s).to.deep.equal({
         serifyKey: null,
@@ -144,7 +140,7 @@ describe('serify', function () {
     it('set', function () {
       const v = new Set(['a', 2, 'c']);
 
-      const s = serify<DefaultTypeMap>(v, defaultOptions);
+      const s = serify(v, defaultOptions);
 
       expect(s).to.deep.equal({
         serifyKey: null,
@@ -156,7 +152,7 @@ describe('serify', function () {
     it('undefined', function () {
       const v = undefined;
 
-      const s = serify<DefaultTypeMap>(v, defaultOptions);
+      const s = serify(v, defaultOptions);
 
       expect(s).to.deep.equal({
         serifyKey: null,
@@ -191,7 +187,7 @@ describe('serify', function () {
         ],
       ]);
 
-      const s = serify<DefaultTypeMap>(v, defaultOptions);
+      const s = serify(v, defaultOptions);
 
       expect(s).to.deep.equal({
         serifyKey: null,
@@ -238,7 +234,7 @@ describe('serify', function () {
     it('custom', function () {
       const v = new Custom(42);
 
-      const s = serify<CustomTypeMap>(v, customOptions);
+      const s = serify(v, customOptions);
 
       expect(s).to.deep.equal({ serifyKey: null, type: 'Custom', value: 42 });
     });
@@ -246,7 +242,7 @@ describe('serify', function () {
     it('custom with key', function () {
       const v = new CustomFoo(42);
 
-      const s = serify<CustomFooTypeMap>(v, customFooOptions);
+      const s = serify(v, customFooOptions);
 
       expect(s).to.deep.equal({ serifyKey: null, type: 'Foo', value: 42 });
     });
@@ -256,7 +252,7 @@ describe('serify', function () {
     it('invalid serifier', function () {
       const v = new Custom(42);
 
-      expect(() => serify<DefaultTypeMap>(v, defaultOptions)).to.throw(
+      expect(() => serify(v, defaultOptions)).to.throw(
         Error,
         'unserifiable type: Custom',
       );

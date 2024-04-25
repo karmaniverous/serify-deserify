@@ -9,7 +9,7 @@ import {
 import { expect } from 'chai';
 
 import { createReduxMiddleware, serify } from '../';
-import { Custom, customOptions, type CustomTypeMap } from '../test/Custom';
+import { Custom, customOptions } from '../test/Custom';
 
 // Create state type.
 interface TestState {
@@ -32,22 +32,15 @@ const testSlice = createSlice({
   },
 });
 
-const reducer = combineReducers({
-  test: testSlice.reducer,
-});
-
-type RootState = ReturnType<typeof reducer>;
-
 // Create middleware.
-const serifyMiddleware = createReduxMiddleware<CustomTypeMap, RootState>(
-  customOptions,
-);
+const serifyMiddleware = createReduxMiddleware(customOptions);
 
 // Configure redux store.
 const store = configureStore({
-  reducer,
+  reducer: combineReducers({
+    test: testSlice.reducer,
+  }),
   middleware: (getDefaultMiddleware) =>
-    // eslint-disable-next-line @typescript-eslint/ban-types
     getDefaultMiddleware().concat(serifyMiddleware),
 });
 
@@ -78,7 +71,7 @@ describe('redux', function () {
 
       const s = bounceValue(v);
 
-      expect(s).to.equal(serify<CustomTypeMap>(v, customOptions));
+      expect(s).to.equal(serify(v, customOptions));
     });
 
     it('bool', function () {
@@ -86,7 +79,7 @@ describe('redux', function () {
 
       const s = bounceValue(v);
 
-      expect(s).to.equal(serify<CustomTypeMap>(v, customOptions));
+      expect(s).to.equal(serify(v, customOptions));
     });
 
     it('number', function () {
@@ -94,7 +87,7 @@ describe('redux', function () {
 
       const s = bounceValue(v);
 
-      expect(s).to.equal(serify<CustomTypeMap>(v, customOptions));
+      expect(s).to.equal(serify(v, customOptions));
     });
 
     it('string', function () {
@@ -102,7 +95,7 @@ describe('redux', function () {
 
       const s = bounceValue(v);
 
-      expect(s).to.equal(serify<CustomTypeMap>(v, customOptions));
+      expect(s).to.equal(serify(v, customOptions));
     });
 
     it('object', function () {
@@ -110,7 +103,7 @@ describe('redux', function () {
 
       const s = bounceValue(v);
 
-      expect(s).to.deep.equal(serify<CustomTypeMap>(v, customOptions));
+      expect(s).to.deep.equal(serify(v, customOptions));
     });
 
     it('array', function () {
@@ -118,7 +111,7 @@ describe('redux', function () {
 
       const s = bounceValue(v);
 
-      expect(s).to.deep.equal(serify<CustomTypeMap>(v, customOptions));
+      expect(s).to.deep.equal(serify(v, customOptions));
     });
 
     it('complex', function () {
@@ -131,7 +124,7 @@ describe('redux', function () {
 
       const s = bounceValue(v);
 
-      expect(s).to.deep.equal(serify<CustomTypeMap>(v, customOptions));
+      expect(s).to.deep.equal(serify(v, customOptions));
     });
   });
 
@@ -141,7 +134,7 @@ describe('redux', function () {
 
       const s = bounceValue(v);
 
-      expect(s).to.deep.equal(serify<CustomTypeMap>(v, customOptions));
+      expect(s).to.deep.equal(serify(v, customOptions));
     });
 
     it('date', function () {
@@ -149,7 +142,7 @@ describe('redux', function () {
 
       const s = bounceValue(v);
 
-      expect(s).to.deep.equal(serify<CustomTypeMap>(v, customOptions));
+      expect(s).to.deep.equal(serify(v, customOptions));
     });
 
     it('map', function () {
@@ -161,7 +154,7 @@ describe('redux', function () {
 
       const s = bounceValue(v);
 
-      expect(s).to.deep.equal(serify<CustomTypeMap>(v, customOptions));
+      expect(s).to.deep.equal(serify(v, customOptions));
     });
 
     it('set', function () {
@@ -169,7 +162,7 @@ describe('redux', function () {
 
       const s = bounceValue(v);
 
-      expect(s).to.deep.equal(serify<CustomTypeMap>(v, customOptions));
+      expect(s).to.deep.equal(serify(v, customOptions));
     });
 
     it('undefined', function () {
@@ -177,7 +170,7 @@ describe('redux', function () {
 
       const s = bounceValue(v);
 
-      expect(s).to.deep.equal(serify<CustomTypeMap>(v, customOptions));
+      expect(s).to.deep.equal(serify(v, customOptions));
     });
 
     it('complex', function () {
@@ -208,7 +201,7 @@ describe('redux', function () {
 
       const s = bounceValue(v);
 
-      expect(s).to.deep.equal(serify<CustomTypeMap>(v, customOptions));
+      expect(s).to.deep.equal(serify(v, customOptions));
     });
 
     it('custom', function () {
@@ -216,7 +209,7 @@ describe('redux', function () {
 
       const s = bounceValue(v);
 
-      expect(s).to.deep.equal(serify<CustomTypeMap>(v, customOptions));
+      expect(s).to.deep.equal(serify(v, customOptions));
     });
   });
 });
