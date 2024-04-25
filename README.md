@@ -7,7 +7,7 @@ one
 
 `JSON.stringify` and `JSON.parse` are a notoriously bad serializer/deserializer
 combination. They don't support important Javascript types like `BigInt`,
-`Date`, `Map`, and `Set`. Thanks to backward compatibility risk, they probably
+`Date`, `Map`, `Set`, and `unknown`. Thanks to backward compatibility risk, they probably
 never will.
 
 There are tons of custom serializers that address this issue, notably
@@ -140,111 +140,120 @@ for a fully worked out example using the Redux middleware.
 <a name="serifyKey"></a>
 
 ## serifyKey
+
 static property name to override an object's serify key
 
 **Kind**: global constant  
 <a name="createReduxMiddleware"></a>
 
 ## createReduxMiddleware([options]) ⇒ <code>function</code>
+
 create redux middleware
 
 **Kind**: global function  
-**Returns**: <code>function</code> - redux middleware  
+**Returns**: <code>function</code> - redux middleware
 
-| Param | Type | Description |
-| --- | --- | --- |
+| Param     | Type                             | Description    |
+| --------- | -------------------------------- | -------------- |
 | [options] | [<code>Options</code>](#Options) | options object |
 
 <a name="deserify"></a>
 
 ## deserify([value], [options]) ⇒ <code>\*</code>
+
 deserify a value
 
 **Kind**: global function  
-**Returns**: <code>\*</code> - deserified value  
+**Returns**: <code>\*</code> - deserified value
 
-| Param | Type | Description |
-| --- | --- | --- |
-| [value] | <code>\*</code> | value to be deserified |
-| [options] | [<code>Options</code>](#Options) | options object |
+| Param     | Type                             | Description            |
+| --------- | -------------------------------- | ---------------------- |
+| [value]   | <code>\*</code>                  | value to be deserified |
+| [options] | [<code>Options</code>](#Options) | options object         |
 
 <a name="serify"></a>
 
 ## serify([value], [options]) ⇒ <code>\*</code>
+
 serify a value
 
 **Kind**: global function  
-**Returns**: <code>\*</code> - serified value  
+**Returns**: <code>\*</code> - serified value
 
-| Param | Type | Description |
-| --- | --- | --- |
-| [value] | <code>\*</code> | value to be serified |
-| [options] | [<code>Options</code>](#Options) | options object |
+| Param     | Type                             | Description          |
+| --------- | -------------------------------- | -------------------- |
+| [value]   | <code>\*</code>                  | value to be serified |
+| [options] | [<code>Options</code>](#Options) | options object       |
 
 <a name="serifierCallback"></a>
 
 ## serifierCallback ⇒ <code>\*</code>
+
 callback to serify a custom type.
 
 **Kind**: global typedef  
-**Returns**: <code>\*</code> - serified value  
+**Returns**: <code>\*</code> - serified value
 
-| Param | Type | Description |
-| --- | --- | --- |
+| Param | Type            | Description      |
+| ----- | --------------- | ---------------- |
 | value | <code>\*</code> | unserified value |
 
 <a name="deserifierCallback"></a>
 
 ## deserifierCallback ⇒ <code>\*</code>
+
 callback to deserify a custom type.
 
 **Kind**: global typedef  
-**Returns**: <code>\*</code> - unserified value  
+**Returns**: <code>\*</code> - unserified value
 
-| Param | Type | Description |
-| --- | --- | --- |
+| Param | Type            | Description    |
+| ----- | --------------- | -------------- |
 | value | <code>\*</code> | serified value |
 
 <a name="OptionsType"></a>
 
 ## OptionsType : <code>Object</code>
+
 serify-deserify options type
 
 **Kind**: global typedef  
 **Properties**
 
-| Name | Type | Description |
-| --- | --- | --- |
-| serifier | [<code>serifierCallback</code>](#serifierCallback) | serifier callback |
+| Name       | Type                                                   | Description         |
+| ---------- | ------------------------------------------------------ | ------------------- |
+| serifier   | [<code>serifierCallback</code>](#serifierCallback)     | serifier callback   |
 | deserifier | [<code>deserifierCallback</code>](#deserifierCallback) | deserifier callback |
 
 <a name="OptionsTypes"></a>
 
 ## OptionsTypes : <code>Object</code>
+
 serify-deserify options types
 
 **Kind**: global typedef  
 **Properties**
 
-| Name | Type | Description |
-| --- | --- | --- |
+| Name       | Type                                     | Description     |
+| ---------- | ---------------------------------------- | --------------- |
 | [...types] | [<code>OptionsType</code>](#OptionsType) | supported types |
 
 <a name="Options"></a>
 
 ## Options : <code>Object</code>
+
 serify-deserify options object
 
 **Kind**: global typedef  
 **Properties**
 
-| Name | Type | Description |
-| --- | --- | --- |
-| [serifyKey] | <code>string</code> | serify key |
-| types | [<code>OptionsTypes</code>](#OptionsTypes) | types object |
-
+| Name        | Type                                       | Description  |
+| ----------- | ------------------------------------------ | ------------ |
+| [serifyKey] | <code>string</code>                        | serify key   |
+| types       | [<code>OptionsTypes</code>](#OptionsTypes) | types object |
 
 ---
 
 See more great templates and other tools on
 [my GitHub Profile](https://github.com/karmaniverous)!
+

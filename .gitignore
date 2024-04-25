@@ -3,3 +3,5 @@ coverage/
 dist/
 esm/
 node_modules/
+.rollup.cache/
+.tsbuildinfo

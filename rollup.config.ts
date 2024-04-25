@@ -1,3 +1,4 @@
+import { nodeResolve } from '@rollup/plugin-node-resolve';
 import terserPlugin from '@rollup/plugin-terser';
 import typescriptPlugin from '@rollup/plugin-typescript';
 import type { InputOptions, OutputOptions, RollupOptions } from 'rollup';
@@ -9,7 +10,7 @@ const outputPath = `dist/index`;
 
 const commonInputOptions: InputOptions = {
   input: 'src/index.ts',
-  plugins: [typescriptPlugin()],
+  plugins: [nodeResolve(), typescriptPlugin()],
 };
 
 const iifeCommonOutputOptions: OutputOptions = {
@@ -20,7 +21,13 @@ const config: RollupOptions[] = [
   // ESM output.
   {
     ...commonInputOptions,
-    output: [{ extend: true, file: `${outputPath}.mjs`, format: 'esm' }],
+    output: [
+      {
+        extend: true,
+        file: `${outputPath}.mjs`,
+        format: 'esm',
+      },
+    ],
   },
 
   // IIFE output.
