@@ -228,6 +228,35 @@ const deserified = deserify(serified, customOptions);
 // CustomFoo { p: 42 }
 ```
 
+## Recursion
+
+In the [Custom Configuration](#custom-configuration) example above, the `Custom` class contains a single property `p` that is populated with a primitive, serializable value (a `number`). So once a `Custom` value is serified with the `serifier` function defined above, there will be no difficulty serializing the `value` property of the resulting object.
+
+What if the `Custom` class contained a property that was itself not serializable? This is the case with the `Map` class, which can contain keys and values of any type, including unserializable ones.
+
+If you look at the [`defaultOptions`](./src/options/defaultOptions.ts) object, you'll see that the `Map` type's `serifier` and `deserfier` functions are quite simple:
+
+```ts
+export interface DefaultTypeMap extends SerifiableTypeMap {
+  ...;
+  Map: [Map<unknown, unknown>, [unknown, unknown][]];
+  ...;
+}
+
+export const defaultOptions: SerifyOptions<DefaultTypeMap> = {
+  types: {
+    ...,
+    Map: {
+      serifier: (value) => [...value.entries()],
+      deserifier: (value) => new Map(value),
+    },
+    ...,
+  },
+};
+```
+
+This works because the `serifier` and `deserifier` functions are applied recursively. They only need to support the direct transformation of a type into a serializable form and back again, without regard to the resulting _contents_... so long as those contents are _also_ composed of serifiable types.
+
 ## Redux
 
 The `createReduxMiddleware` function generates a Redux middleware that will
