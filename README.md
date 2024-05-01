@@ -202,7 +202,7 @@ export class CustomFoo {
 // Extend the default type map to include your new type.
 // The tuple indicates the type before and after serification.
 interface FooTypeMap extends SerifiableTypeMap {
-  Custom: [CustomFoo, number]
+  Foo: [CustomFoo, number]
 }
 
 // A serify options object including support for the new custom type.
