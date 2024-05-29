@@ -268,9 +268,40 @@ new type to your serify options!
 When retrieving values from the Redux store, either deserify them explicitly or
 wrap your selectors in the `deserify` function.
 
-See the [`createReduxMiddleware` unit tests](./src/createReduxMiddleware/createReduxMiddleware.test.ts) for a fully worked out example.
+See the [`createReduxMiddleware` unit tests](./src/createReduxMiddleware/createReduxMiddleware.test.ts) for a fully worked out example with custom types, or just try this for the out-of-the-box experience:
+
+````ts
+import {
+	createReduxMiddleware,
+	defaultOptions,
+} from '@karmaniverous/serify-deserify';
+
+// Create middleware.
+const serifyMiddleware = createReduxMiddleware(defaultOptions);
+
+// Construct slice.
+const testSlice = createSlice({
+  name: 'test',
+  initialState,
+  reducers: {
+    setValue: (state, { payload }: PayloadAction<TestState['value']>) => {
+      state.value = payload;
+    },
+  },
+});
+
+// Configure redux store.
+const store = configureStore({
+  reducer: combineReducers({
+    test: testSlice.reducer,
+  }),
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware().concat(serifyMiddleware),
+});
+```
 
 ---
 
 See more great templates and other tools on
 [my GitHub Profile](https://github.com/karmaniverous)!
+````
