@@ -270,10 +270,10 @@ wrap your selectors in the `deserify` function.
 
 See the [`createReduxMiddleware` unit tests](./src/createReduxMiddleware/createReduxMiddleware.test.ts) for a fully worked out example with custom types, or just try this for the out-of-the-box experience:
 
-````ts
+```ts
 import {
-	createReduxMiddleware,
-	defaultOptions,
+  createReduxMiddleware,
+  defaultOptions,
 } from '@karmaniverous/serify-deserify';
 
 // Create middleware.
@@ -304,4 +304,3 @@ const store = configureStore({
 
 See more great templates and other tools on
 [my GitHub Profile](https://github.com/karmaniverous)!
-````
