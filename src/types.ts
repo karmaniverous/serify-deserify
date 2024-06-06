@@ -78,7 +78,7 @@ export function isSerifiedValue<M extends SerifiableTypeMap>(
     'serifyKey' in value &&
     value.serifyKey === options.serifyKey &&
     'type' in value &&
-    value.type in options.types &&
+    (value.type as string) in options.types &&
     'value' in value
   );
 }
