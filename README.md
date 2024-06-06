@@ -61,6 +61,12 @@ In this case, simply add a non-null `serifyKey` of a serifiable primitive type (
 
 [Serifiable types](#serifiable-types) and the [`serifyKey`](#serifykey) are defined in an `options` object, which specifies the logic that converts each type to and from a serializable form.
 
+## Cloning in Deserify
+
+`deserify` will not mutate the input value. It will clone the value first, then recursively deserify the clone's contents.
+
+It is implicitly assumed that the input value is composed entirely of serializable types, otherwise why bother attempting to deserify it? So rather than introduce a new dependency on a deep cloning library, `deserify` will simply clone the value with `JSON.parse(JSON.stringify(value))` before deserifying it.
+
 ### Default Configuration
 
 Out of the box, the [`defaultOptions`](./src/options/defaultOptions.ts) object supports the `BigInt`, `Date`, `Map`, `Set`, and `unknown` types.

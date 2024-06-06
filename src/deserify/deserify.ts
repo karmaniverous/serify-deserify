@@ -33,7 +33,7 @@ const _deserify = <M extends SerifiableTypeMap = DefaultTypeMap>(
 
 /**
  * Deserify a value. Clones the value prior to deserification. Implicitly
- * assumes that the value is composed entirely of serifiable types and thus
+ * assumes that the value is composed entirely of serializable types and thus
  * clonable via JSON.parse(JSON.stringify(value)).
  */
 export const deserify = <M extends SerifiableTypeMap = DefaultTypeMap>(
