@@ -39,4 +39,14 @@ const _deserify = <M extends SerifiableTypeMap = DefaultTypeMap>(
 export const deserify = <M extends SerifiableTypeMap = DefaultTypeMap>(
   value: unknown,
   options: SerifyOptions<M>,
-): unknown => _deserify<M>(JSON.parse(JSON.stringify(value)), options);
+): unknown => {
+  let clone: typeof value;
+
+  try {
+    clone = JSON.parse(JSON.stringify(value));
+  } catch {
+    throw new Error(`Value is not clonable: ${JSON.stringify(value)}`);
+  }
+
+  return _deserify<M>(clone, options);
+};
