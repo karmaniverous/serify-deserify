@@ -15,7 +15,6 @@ export const createReduxMiddleware =
   () =>
   (next) =>
   (action) => {
-    if (isAnyObject(action))
-      action.payload = serify(action.payload as unknown, options);
+    if (isAnyObject(action)) action.payload = serify(action.payload, options);
     next(action);
   };
