@@ -63,9 +63,9 @@ In this case, simply add a non-null `serifyKey` of a serifiable primitive type (
 
 ## Cloning in Deserify
 
-`deserify` will not mutate the input value. It will clone the value first, then recursively deserify the clone's contents.
+`deserify` will not mutate the input value. It clones the value while recursively deserifying its contents.
 
-It is implicitly assumed that the input value is composed entirely of serializable types, otherwise why bother attempting to deserify it? So rather than introduce a new dependency on a deep cloning library, `deserify` will simply clone the value with `JSON.parse(JSON.stringify(value))` before deserifying it.
+It is implicitly assumed that the input value is composed entirely of serializable types, otherwise why bother attempting to deserify it?
 
 ### Default Configuration
 
