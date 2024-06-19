@@ -113,7 +113,6 @@
     "build": "rimraf dist && rollup --config rollup.config.ts --configPlugin @rollup/plugin-typescript",
     "lint": "eslint src/** && prettier -c src",
     "lint:fix": "eslint --fix src/** && prettier --write src",
-    "postinstall": "npm audit fix",
     "release": "release-it",
     "release:pre": "vc -c \"release-it --no-git.requireBranch --github.prerelease --preRelease\"",
     "test": "cross-env LOG_LEVEL=debug nyc mocha"
