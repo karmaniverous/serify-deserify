@@ -1,4 +1,4 @@
-<p align="center" style="font-size: 36pt">serify-deserify</p>
+<p align="center" style="font-size: 4em">serify-deserify</p>
 
 <p align="center"><img src="./assets/flowchart.png"></p>
 
