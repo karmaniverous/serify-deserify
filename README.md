@@ -1,4 +1,6 @@
-![Why Serify?](./assets/flowchart.png)
+<p align="center" style="font-size: 36pt">serify-deserify</p>
+
+<p align="center"><img src="./assets/flowchart.png"></p>
 
 **serify** - reversibly transform an unserializable value into a serializable one
 
