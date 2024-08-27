@@ -1,12 +1,8 @@
+![Why Serify?](./assets/flowchart.png)
+
 **serify** - reversibly transform an unserializable value into a serializable one
 
 **deserify** - do the exact opposite
-
----
-
-**_BREAKING CHANGE:_** _The v2.0.0 release is a complete TypeScript refactor. The API now requires you to import & extend the [`defaultOptions`](./src/options/defaultOptions.ts) object to create custom types. See the [Options section](#options) for more info!_
-
----
 
 ## Why?
 
