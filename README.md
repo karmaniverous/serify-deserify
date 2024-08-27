@@ -20,7 +20,26 @@ To install the package, run this command:
 npm install @karmaniverous/serify-deserify
 ```
 
-Review the unit tests for simple examples of how to use [`serify`](./src/serify/serify.test.ts) and [`deserify`](./src/deserify/deserify.test.ts).
+A simple example:
+
+```js
+import {
+  serify,
+  deserify,
+  defaultOptions,
+} from '@karmaniverous/serify-deserify';
+
+// A BigInt test value.
+const value = 42n;
+
+const serified = serify(value, defaultOptions);
+// { serifyKey: null, type: 'BigInt', value: '42' }
+
+const deserified = deserify(serified, defaultOptions);
+// 42n
+```
+
+Review the unit tests for more examples of how to use [`serify`](./src/serify/serify.test.ts) and [`deserify`](./src/deserify/deserify.test.ts).
 
 See the [`createReduxMiddleware` unit tests](./src/createReduxMiddleware/createReduxMiddleware.test.ts) for a fully worked out example of how to configure & integrate the Redux middleware.
 
@@ -57,12 +76,6 @@ In this case, simply add a non-null `serifyKey` of a serifiable primitive type (
 
 [Serifiable types](#serifiable-types) and the [`serifyKey`](#serifykey) are defined in an `options` object, which specifies the logic that converts each type to and from a serializable form.
 
-## Cloning in Deserify
-
-`deserify` will not mutate the input value. It clones the value while recursively deserifying its contents.
-
-It is implicitly assumed that the input value is composed entirely of serializable types, otherwise why bother attempting to deserify it?
-
 ### Default Configuration
 
 Out of the box, the [`defaultOptions`](./src/options/defaultOptions.ts) object supports the `BigInt`, `Date`, `Map`, `Set`, and `unknown` types.
@@ -77,7 +90,7 @@ import {
 } from '@karmaniverous/serify-deserify';
 
 // A BigInt test value.
-const bigAnswer = 42n;
+const value = 42n;
 
 const serified = serify(value, defaultOptions);
 // { serifyKey: null, type: 'BigInt', value: '42' }
@@ -301,6 +314,12 @@ const store = configureStore({
     getDefaultMiddleware().concat(serifyMiddleware),
 });
 ```
+
+## Cloning in Deserify
+
+`deserify` will not mutate the input value. It clones the value while recursively deserifying its contents.
+
+It is implicitly assumed that the input value is composed entirely of serializable types, otherwise why bother attempting to deserify it?
 
 ---
 
