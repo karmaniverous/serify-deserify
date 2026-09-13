@@ -6,6 +6,7 @@ export interface DefaultTypeMap extends SerifiableTypeMap {
   Map: [Map<unknown, unknown>, [unknown, unknown][]];
   Set: [Set<unknown>, unknown[]];
   Undefined: [undefined, null];
+  NullObject: [object, object];
 }
 
 export const defaultOptions: SerifyOptions<DefaultTypeMap> = {
@@ -30,6 +31,11 @@ export const defaultOptions: SerifyOptions<DefaultTypeMap> = {
     Undefined: {
       serifier: () => null,
       deserifier: () => undefined,
+    },
+    NullObject: {
+      serifier: (value) => ({ ...value }),
+      deserifier: (value) =>
+        Object.assign(Object.create(null), value) as object,
     },
   },
 };

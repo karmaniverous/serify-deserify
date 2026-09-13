@@ -46,6 +46,9 @@ describe('deserify', function () {
       const d = deserify(v, defaultOptions);
 
       expect(d).to.deep.equal(v);
+      expect(typeof (d as Record<string, unknown>).constructor).not.to.equal(
+        undefined,
+      );
     });
 
     it('array', function () {
@@ -190,6 +193,19 @@ describe('deserify', function () {
   ]
 }`,
       );
+    });
+
+    it('null object', function () {
+      const v = {
+        serifyKey: null,
+        type: 'NullObject',
+        value: { p: { serifyKey: null, type: 'BigInt', value: '42' } },
+      };
+
+      const d = deserify(v, defaultOptions);
+
+      expect(d).to.deep.equal(Object.assign(Object.create(null), { p: 42n }));
+      expect((d as Record<string, unknown>).constructor).to.equal(undefined);
     });
 
     it('custom', function () {

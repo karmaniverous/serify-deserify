@@ -2,6 +2,7 @@ import { getType, isAnyObject, isArray, isPlainObject } from 'is-what';
 
 import { type DefaultTypeMap } from '../options/defaultOptions';
 import {
+  isNullObject,
   isSerializablePrimitive,
   type SerifiableTypeMap,
   type SerifyOptions,
@@ -22,9 +23,11 @@ export const serify = <M extends SerifiableTypeMap = DefaultTypeMap>(
   if (isSerializablePrimitive(value)) return value;
 
   const valueType = isAnyObject(value)
-    ? serifyStaticTypeProperty in value.constructor
-      ? (value.constructor[serifyStaticTypeProperty] as string)
-      : value.constructor.name
+    ? isNullObject(value)
+      ? 'NullObject'
+      : serifyStaticTypeProperty in value.constructor
+        ? (value.constructor[serifyStaticTypeProperty] as string)
+        : value.constructor.name
     : getType(value);
 
   if (valueType in options.types)

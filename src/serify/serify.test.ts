@@ -2,7 +2,7 @@
 
 import { expect } from 'chai';
 
-import { defaultOptions, serify } from '../';
+import { defaultOptions, serify, serifyStaticTypeProperty } from '../';
 import { Custom, customOptions } from '../test/Custom';
 import { CustomFoo, customFooOptions } from '../test/CustomFoo';
 
@@ -228,6 +228,19 @@ describe('serify', function () {
             ],
           ],
         ],
+      });
+    });
+
+    it('null object', function () {
+      const v = Object.create(null) as Record<string, unknown>;
+      v.p = 42n;
+
+      const s = serify(v, defaultOptions);
+
+      expect(s).to.deep.equal({
+        serifyKey: null,
+        type: 'NullObject',
+        value: { p: { serifyKey: null, type: 'BigInt', value: '42' } },
       });
     });
 
