@@ -325,6 +325,41 @@ describe('serify', function () {
 
       expect(Object.keys(s as object)).to.deep.equal(['id']);
     });
+
+    it('preserves a custom constructor key holding a string on a plain object', function () {
+      const v = JSON.parse('{"constructor":"widget","price":5}') as unknown;
+
+      const s = serify(v, defaultOptions);
+
+      expect(JSON.stringify(s)).to.equal('{"constructor":"widget","price":5}');
+    });
+
+    it('preserves a custom constructor key holding a string on a null object', function () {
+      const v = Object.create(null) as object;
+      Object.defineProperty(v, 'constructor', {
+        value: 'gadget',
+        enumerable: true,
+      });
+      Object.defineProperty(v, 'stock', { value: 8, enumerable: true });
+
+      const s = serify(v, defaultOptions);
+
+      expect(JSON.stringify(s)).to.equal(
+        '{"serifyKey":null,"type":"NullObject","value":{"constructor":"gadget","stock":8}}',
+      );
+    });
+
+    it('does not choose the serifier from a custom constructor key', function () {
+      const v = JSON.parse(
+        '{"constructor":{"name":"Date"},"hour":9}',
+      ) as unknown;
+
+      const s = serify(v, defaultOptions);
+
+      expect(JSON.stringify(s)).to.equal(
+        '{"constructor":{"name":"Date"},"hour":9}',
+      );
+    });
   });
 
   describe('errors', function () {
@@ -334,6 +369,16 @@ describe('serify', function () {
       expect(() => serify(v, defaultOptions)).to.throw(
         Error,
         'unserifiable type: Custom',
+      );
+    });
+
+    it('reports an unserifiable type for an object whose prototype chain has no constructor', function () {
+      const v = Object.create(Object.create(null) as object) as object;
+      Object.defineProperty(v, 'colour', { value: 'teal', enumerable: true });
+
+      expect(() => serify(v, defaultOptions)).to.throw(
+        Error,
+        'unserifiable type: Object',
       );
     });
   });

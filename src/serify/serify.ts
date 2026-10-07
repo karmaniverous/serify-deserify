@@ -14,6 +14,26 @@ import {
 export const serifyStaticTypeProperty = Symbol('serify static type property');
 
 /**
+ * determine a value's type identifier
+ */
+const getSerifyTypeIdentifier = (value: unknown): string => {
+  if (isNullObject(value)) return 'NullObject';
+
+  if (isAnyObject(value)) {
+    // Use prototype's constructor to prevent a custom `constructor` key shadowing it
+    const { constructor } = Object.getPrototypeOf(value) as {
+      constructor?: unknown;
+    };
+    if (typeof constructor === 'function')
+      return serifyStaticTypeProperty in constructor
+        ? (constructor[serifyStaticTypeProperty] as string)
+        : constructor.name;
+  }
+
+  return getType(value);
+};
+
+/**
  * serify a value
  */
 export const serify = <M extends SerifiableTypeMap = DefaultTypeMap>(
@@ -22,13 +42,7 @@ export const serify = <M extends SerifiableTypeMap = DefaultTypeMap>(
 ): unknown => {
   if (isSerializablePrimitive(value)) return value;
 
-  const valueType = isNullObject(value)
-    ? 'NullObject'
-    : isAnyObject(value)
-      ? serifyStaticTypeProperty in value.constructor
-        ? (value.constructor[serifyStaticTypeProperty] as string)
-        : value.constructor.name
-      : getType(value);
+  const valueType = getSerifyTypeIdentifier(value);
 
   if (valueType in options.types)
     return {

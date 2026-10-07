@@ -335,5 +335,40 @@ describe('deserify', function () {
         ['__proto__', { month: 'October' }],
       ]);
     });
+
+    it('preserves a custom constructor key and the standard prototype on a plain object', function () {
+      const v = JSON.parse('{"constructor":"bicycle","wheels":2}') as unknown;
+
+      const d = deserify(
+        JSON.parse(JSON.stringify(serify(v, defaultOptions))),
+        defaultOptions,
+      ) as object;
+
+      expect(Object.getPrototypeOf(d)).to.equal(Object.prototype);
+      expect(Object.entries(d)).to.deep.equal([
+        ['constructor', 'bicycle'],
+        ['wheels', 2],
+      ]);
+    });
+
+    it('preserves a custom constructor key and the null prototype on a null object', function () {
+      const v = Object.create(null) as object;
+      Object.defineProperty(v, 'constructor', {
+        value: 'kettle',
+        enumerable: true,
+      });
+      Object.defineProperty(v, 'litres', { value: 1.5, enumerable: true });
+
+      const d = deserify(
+        JSON.parse(JSON.stringify(serify(v, defaultOptions))),
+        defaultOptions,
+      ) as object;
+
+      expect(Object.getPrototypeOf(d)).to.equal(null);
+      expect(Object.entries(d)).to.deep.equal([
+        ['constructor', 'kettle'],
+        ['litres', 1.5],
+      ]);
+    });
   });
 });
