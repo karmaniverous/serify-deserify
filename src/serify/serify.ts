@@ -22,13 +22,13 @@ export const serify = <M extends SerifiableTypeMap = DefaultTypeMap>(
 ): unknown => {
   if (isSerializablePrimitive(value)) return value;
 
-  const valueType = isAnyObject(value)
-    ? isNullObject(value)
-      ? 'NullObject'
-      : serifyStaticTypeProperty in value.constructor
+  const valueType = isNullObject(value)
+    ? 'NullObject'
+    : isAnyObject(value)
+      ? serifyStaticTypeProperty in value.constructor
         ? (value.constructor[serifyStaticTypeProperty] as string)
         : value.constructor.name
-    : getType(value);
+      : getType(value);
 
   if (valueType in options.types)
     return {
