@@ -2,7 +2,7 @@
 
 import { expect } from 'chai';
 
-import { defaultOptions, serify, serifyStaticTypeProperty } from '../';
+import { defaultOptions, serify } from '../';
 import { Custom, customOptions } from '../test/Custom';
 import { CustomFoo, customFooOptions } from '../test/CustomFoo';
 
