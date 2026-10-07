@@ -39,11 +39,11 @@ export const serify = <M extends SerifiableTypeMap = DefaultTypeMap>(
 
   if (isArray(value)) return value.map((v) => serify(v, options));
 
-  if (isPlainObject(value)) {
-    const copy: Record<string, unknown> = {};
-    for (const p in value) copy[p] = serify(value[p], options);
-    return copy;
-  }
+  if (isPlainObject(value))
+    // Ensure own keys are defined as ordinary properties & exclude inherited properties
+    return Object.fromEntries(
+      Object.entries(value).map(([k, v]) => [k, serify(v, options)]),
+    );
 
   throw new Error(`unserifiable type: ${valueType}`);
 };
