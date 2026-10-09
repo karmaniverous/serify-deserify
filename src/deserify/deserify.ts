@@ -26,11 +26,11 @@ export const deserify = <M extends SerifiableTypeMap = DefaultTypeMap>(
 
   if (isArray(value)) return value.map((v) => deserify(v, options));
 
-  if (isPlainObject(value)) {
-    const copy: Record<string, unknown> = {};
-    for (const p in value) copy[p] = deserify(value[p], options);
-    return copy;
-  }
+  if (isPlainObject(value))
+    // Ensure own keys are defined as ordinary properties & exclude inherited properties
+    return Object.fromEntries(
+      Object.entries(value).map(([k, v]) => [k, deserify(v, options)]),
+    );
 
   throw new Error(`Value is not deserifiable: ${JSON.stringify(value)}`);
 };

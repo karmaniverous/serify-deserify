@@ -3,7 +3,7 @@
 import { expect } from 'chai';
 import { inspect } from 'util';
 
-import { defaultOptions, deserify } from '../';
+import { defaultOptions, deserify, serify } from '../';
 import { customOptions } from '../test/Custom';
 
 describe('deserify', function () {
@@ -46,6 +46,9 @@ describe('deserify', function () {
       const d = deserify(v, defaultOptions);
 
       expect(d).to.deep.equal(v);
+      expect(typeof (d as Record<string, unknown>).constructor).not.to.equal(
+        undefined,
+      );
     });
 
     it('array', function () {
@@ -192,6 +195,19 @@ describe('deserify', function () {
       );
     });
 
+    it('null object', function () {
+      const v = {
+        serifyKey: null,
+        type: 'NullObject',
+        value: { p: { serifyKey: null, type: 'BigInt', value: '42' } },
+      };
+
+      const d = deserify(v, defaultOptions);
+
+      expect(d).to.deep.equal(Object.assign(Object.create(null), { p: 42n }));
+      expect((d as Record<string, unknown>).constructor).to.equal(undefined);
+    });
+
     it('custom', function () {
       const v = {
         serifyKey: null,
@@ -228,6 +244,131 @@ describe('deserify', function () {
       const d = deserify(v, customOptions);
 
       expect(d).to.deep.equal(v);
+    });
+  });
+
+  describe('object keys', function () {
+    afterEach(function () {
+      // Clean up below polluted test
+      delete (Object.prototype as Record<string, unknown>).polluted;
+    });
+
+    it('restores a custom __proto__ key on a plain object without setting its prototype', function () {
+      const v = JSON.parse(
+        '{"label":"first","__proto__":{"weight":10}}',
+      ) as unknown;
+
+      const d = deserify(v, defaultOptions) as object;
+
+      expect(Object.entries(d)).to.deep.equal([
+        ['label', 'first'],
+        ['__proto__', { weight: 10 }],
+      ]);
+      expect((d as Record<string, unknown>).weight).to.equal(undefined);
+    });
+
+    it('restores a custom __proto__ key on a null object without setting its prototype', function () {
+      const v = JSON.parse(
+        '{"serifyKey":null,"type":"NullObject","value":{"enabled":true,"__proto__":{"depth":4}}}',
+      ) as unknown;
+
+      const d = deserify(v, defaultOptions) as object;
+
+      expect(Object.entries(d)).to.deep.equal([
+        ['enabled', true],
+        ['__proto__', { depth: 4 }],
+      ]);
+      expect((d as Record<string, unknown>).depth).to.equal(undefined);
+    });
+
+    it('excludes enumerable keys inherited from Object.prototype', function () {
+      Object.defineProperty(Object.prototype, 'polluted', {
+        value: 'polluted value',
+        enumerable: true,
+        configurable: true,
+        writable: true,
+      });
+
+      const d = deserify({ total: 12 }, defaultOptions);
+
+      expect(Object.keys(d as object)).to.deep.equal(['total']);
+    });
+  });
+
+  describe('round trip', function () {
+    it('preserves a custom __proto__ key and the standard prototype on a plain object', function () {
+      const v = {};
+      Object.defineProperty(v, 'city', { value: 'Perth', enumerable: true });
+      Object.defineProperty(v, '__proto__', {
+        value: { postcode: '6000' },
+        enumerable: true,
+      });
+
+      const d = deserify(
+        JSON.parse(JSON.stringify(serify(v, defaultOptions))),
+        defaultOptions,
+      ) as object;
+
+      expect(Object.getPrototypeOf(d)).to.equal(Object.prototype);
+      expect(Object.entries(d)).to.deep.equal([
+        ['city', 'Perth'],
+        ['__proto__', { postcode: '6000' }],
+      ]);
+    });
+
+    it('preserves a custom __proto__ key and the null prototype on a null object', function () {
+      const v = Object.create(null) as object;
+      Object.defineProperty(v, 'year', { value: 2026, enumerable: true });
+      Object.defineProperty(v, '__proto__', {
+        value: { month: 'October' },
+        enumerable: true,
+      });
+
+      const d = deserify(
+        JSON.parse(JSON.stringify(serify(v, defaultOptions))),
+        defaultOptions,
+      ) as object;
+
+      expect(Object.getPrototypeOf(d)).to.equal(null);
+      expect(Object.entries(d)).to.deep.equal([
+        ['year', 2026],
+        ['__proto__', { month: 'October' }],
+      ]);
+    });
+
+    it('preserves a custom constructor key and the standard prototype on a plain object', function () {
+      const v = JSON.parse('{"constructor":"bicycle","wheels":2}') as unknown;
+
+      const d = deserify(
+        JSON.parse(JSON.stringify(serify(v, defaultOptions))),
+        defaultOptions,
+      ) as object;
+
+      expect(Object.getPrototypeOf(d)).to.equal(Object.prototype);
+      expect(Object.entries(d)).to.deep.equal([
+        ['constructor', 'bicycle'],
+        ['wheels', 2],
+      ]);
+    });
+
+    it('preserves a custom constructor key and the null prototype on a null object', function () {
+      const v = Object.create(null) as object;
+      Object.defineProperty(v, 'constructor', {
+        value: 'kettle',
+        enumerable: true,
+      });
+      Object.defineProperty(v, 'litres', { value: 1.5, enumerable: true });
+
+      const d = deserify(
+        JSON.parse(JSON.stringify(serify(v, defaultOptions))),
+        defaultOptions,
+      ) as object;
+
+      expect(Object.getPrototypeOf(d)).to.equal(null);
+      expect(Object.entries(d)).to.deep.equal([
+        ['constructor', 'kettle'],
+        ['litres', 1.5],
+      ]);
     });
   });
 });

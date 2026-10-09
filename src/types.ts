@@ -82,3 +82,18 @@ export function isSerifiedValue<M extends SerifiableTypeMap>(
     'value' in value
   );
 }
+
+/**
+ * Null-prototype object type guard.
+ *
+ * @example
+ *   isNullObject(Object.create(null)) === true;
+ *   isNullObject({}) === false;
+ */
+export function isNullObject(value: unknown): value is Record<string, unknown> {
+  return (
+    value !== null &&
+    typeof value === 'object' &&
+    Object.getPrototypeOf(value) === null
+  );
+}

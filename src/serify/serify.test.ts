@@ -231,6 +231,19 @@ describe('serify', function () {
       });
     });
 
+    it('null object', function () {
+      const v = Object.create(null) as Record<string, unknown>;
+      v.p = 42n;
+
+      const s = serify(v, defaultOptions);
+
+      expect(s).to.deep.equal({
+        serifyKey: null,
+        type: 'NullObject',
+        value: { p: { serifyKey: null, type: 'BigInt', value: '42' } },
+      });
+    });
+
     it('custom', function () {
       const v = new Custom(42n);
 
@@ -256,6 +269,99 @@ describe('serify', function () {
     });
   });
 
+  describe('object keys', function () {
+    afterEach(function () {
+      // Clean up below polluted test
+      delete (Object.prototype as Record<string, unknown>).polluted;
+    });
+
+    it('preserves a custom __proto__ key on a plain object', function () {
+      const v = {};
+      Object.defineProperty(v, 'name', { value: 'plain', enumerable: true });
+      Object.defineProperty(v, '__proto__', {
+        value: { colour: 'red' },
+        enumerable: true,
+      });
+
+      const s = serify(v, defaultOptions);
+
+      expect(JSON.stringify(s)).to.equal(
+        '{"name":"plain","__proto__":{"colour":"red"}}',
+      );
+    });
+
+    it('preserves a custom __proto__ key on a null object', function () {
+      const v = Object.create(null) as object;
+      Object.defineProperty(v, 'count', { value: 3, enumerable: true });
+      Object.defineProperty(v, '__proto__', {
+        value: { size: 'large' },
+        enumerable: true,
+      });
+
+      const s = serify(v, defaultOptions);
+
+      expect(JSON.stringify(s)).to.equal(
+        '{"serifyKey":null,"type":"NullObject","value":{"count":3,"__proto__":{"size":"large"}}}',
+      );
+    });
+
+    it('does not overwrite the output prototype from a custom __proto__ key', function () {
+      const v = JSON.parse('{"__proto__":{"shape":"circle"}}') as object;
+
+      const s = serify(v, defaultOptions);
+
+      expect(Object.getPrototypeOf(s)).to.equal(Object.prototype);
+    });
+
+    it('excludes enumerable keys inherited from Object.prototype', function () {
+      Object.defineProperty(Object.prototype, 'polluted', {
+        value: 'polluted value',
+        enumerable: true,
+        configurable: true,
+        writable: true,
+      });
+
+      const s = serify({ id: 7 }, defaultOptions);
+
+      expect(Object.keys(s as object)).to.deep.equal(['id']);
+    });
+
+    it('preserves a custom constructor key holding a string on a plain object', function () {
+      const v = JSON.parse('{"constructor":"widget","price":5}') as unknown;
+
+      const s = serify(v, defaultOptions);
+
+      expect(JSON.stringify(s)).to.equal('{"constructor":"widget","price":5}');
+    });
+
+    it('preserves a custom constructor key holding a string on a null object', function () {
+      const v = Object.create(null) as object;
+      Object.defineProperty(v, 'constructor', {
+        value: 'gadget',
+        enumerable: true,
+      });
+      Object.defineProperty(v, 'stock', { value: 8, enumerable: true });
+
+      const s = serify(v, defaultOptions);
+
+      expect(JSON.stringify(s)).to.equal(
+        '{"serifyKey":null,"type":"NullObject","value":{"constructor":"gadget","stock":8}}',
+      );
+    });
+
+    it('does not choose the serifier from a custom constructor key', function () {
+      const v = JSON.parse(
+        '{"constructor":{"name":"Date"},"hour":9}',
+      ) as unknown;
+
+      const s = serify(v, defaultOptions);
+
+      expect(JSON.stringify(s)).to.equal(
+        '{"constructor":{"name":"Date"},"hour":9}',
+      );
+    });
+  });
+
   describe('errors', function () {
     it('invalid serifier', function () {
       const v = new Custom(42n);
@@ -263,6 +369,16 @@ describe('serify', function () {
       expect(() => serify(v, defaultOptions)).to.throw(
         Error,
         'unserifiable type: Custom',
+      );
+    });
+
+    it('reports an unserifiable type for an object whose prototype chain has no constructor', function () {
+      const v = Object.create(Object.create(null) as object) as object;
+      Object.defineProperty(v, 'colour', { value: 'teal', enumerable: true });
+
+      expect(() => serify(v, defaultOptions)).to.throw(
+        Error,
+        'unserifiable type: Object',
       );
     });
   });
