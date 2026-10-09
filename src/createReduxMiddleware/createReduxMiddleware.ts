@@ -20,7 +20,8 @@ import type { SerifiableTypeMap, SerifyOptions } from '../types';
  *
  * @typeParam M - The {@link SerifiableTypeMap} describing supported types.
  * @param options - The {@link SerifyOptions} in effect.
- * @returns Redux middleware.
+ * @returns Redux middleware. It returns the result of passing the action down
+ * the chain, so `dispatch` return values are preserved.
  *
  * @example
  * ```ts
@@ -37,5 +38,5 @@ export const createReduxMiddleware =
   (next) =>
   (action) => {
     if (isAnyObject(action)) action.payload = serify(action.payload, options);
-    next(action);
+    return next(action);
   };

@@ -63,6 +63,7 @@ describe('createReduxMiddleware', () => {
       ['a plain structure', [true, 42, { a: 1, d: [false, '!tanstaafl'] }]],
       ['a BigInt', 1234567890123456789012345678901234567890n],
       ['a Date', new Date('2000-01-02T03:04:05.678Z')],
+      ['Infinity', Infinity],
       ['undefined', undefined],
       ['a nested structure of default types', complexValue()],
       ['a custom type', new Custom(42n)],
@@ -77,6 +78,22 @@ describe('createReduxMiddleware', () => {
         expect(consoleError).not.toHaveBeenCalled();
       },
     );
+
+    it('returns the dispatched action from dispatch', () => {
+      const slice = createSlice({
+        name: 'r',
+        initialState: null,
+        reducers: { ping: () => null },
+      });
+      const store = configureStore({
+        reducer: slice.reducer,
+        middleware: (getDefaultMiddleware) =>
+          getDefaultMiddleware().concat(createReduxMiddleware(defaultOptions)),
+      });
+      const action = slice.actions.ping();
+
+      expect(store.dispatch(action)).toBe(action);
+    });
 
     it('throws on dispatch of a type missing from the options', () => {
       class Unknown {
@@ -96,6 +113,16 @@ describe('createReduxMiddleware', () => {
       createReduxMiddleware(defaultOptions)(api)(next)(42n);
 
       expect(next).toHaveBeenCalledExactlyOnceWith(42n);
+    });
+
+    it('returns the result of next', () => {
+      const next = vi.fn().mockReturnValue('dispatched');
+
+      const result: unknown = createReduxMiddleware(defaultOptions)(api)(next)({
+        type: 'test',
+      });
+
+      expect(result).toBe('dispatched');
     });
 
     it('serifies the payload of object actions in place', () => {
