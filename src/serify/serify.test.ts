@@ -3,263 +3,118 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { defaultOptions, serify } from '../';
 import { Custom, customOptions } from '../test/Custom';
 import { CustomFoo, customFooOptions } from '../test/CustomFoo';
+import { complexSerified, complexValue } from '../test/fixtures';
 
 describe('serify', () => {
-  describe('serializable', () => {
-    it('null', () => {
-      const v = null;
-
-      const s = serify(v, defaultOptions);
-
-      expect(s).toBe(v);
+  describe('serializable values', () => {
+    it.each([
+      ['null', null],
+      ['a boolean', true],
+      ['a number', 42],
+      ['a string', 'tanstaafl'],
+    ])('returns %s unchanged', (_, v) => {
+      expect(serify(v, defaultOptions)).toBe(v);
     });
 
-    it('bool', () => {
-      const v = true;
-
-      const s = serify(v, defaultOptions);
-
-      expect(s).toBe(v);
-    });
-
-    it('number', () => {
-      const v = 42;
-
-      const s = serify(v, defaultOptions);
-
-      expect(s).toBe(v);
-    });
-
-    it('string', () => {
-      const v = 'tanstaafl';
-
-      const s = serify(v, defaultOptions);
-
-      expect(s).toBe(v);
-    });
-
-    it('object', () => {
-      const v = { a: 1, b: 2, c: 3 };
-
+    it.each([
+      ['an object', { a: 1, b: 2, c: 3 }],
+      ['an array', [true, 42, 'tanstaafl']],
+      [
+        'a nested structure',
+        [true, 42, 'tanstaafl', { a: 1, d: [false, -42, '!tanstaafl'] }],
+      ],
+    ])('returns an equal clone of %s', (_, v) => {
       const s = serify(v, defaultOptions);
 
       expect(s).toStrictEqual(v);
+      expect(s).not.toBe(v);
     });
 
-    it('frozen property', () => {
-      const v = { a: 1, b: 2, c: { a: 1, b: 2, c: 3 } };
-      Object.freeze(v.c);
+    it('does not mutate a frozen input', () => {
+      const v = Object.freeze({ a: 1, c: Object.freeze({ d: 2n }) });
 
       const s = serify(v, defaultOptions);
 
-      expect(s).toStrictEqual(v);
-    });
-
-    it('unwritable property', () => {
-      const v = { a: 1, b: 2, c: 3 };
-
-      Object.defineProperty(v, 'd', {
-        value: [1, 2, 3],
-        writable: false,
+      expect(s).toStrictEqual({
+        a: 1,
+        c: { d: { serifyKey: null, type: 'BigInt', value: '2' } },
       });
-
-      const s = serify(v, defaultOptions);
-
-      expect(s).toStrictEqual(v);
+      expect(v.c.d).toBe(2n);
     });
 
-    it('array', () => {
-      const v = [true, 42, 'tanstaafl'];
+    it('omits non-enumerable properties', () => {
+      const v = { a: 1 };
+      Object.defineProperty(v, 'd', { value: [1, 2, 3], writable: false });
 
-      const s = serify(v, defaultOptions);
-
-      expect(s).toStrictEqual(v);
-    });
-
-    it('complex', () => {
-      const v = [
-        true,
-        42,
-        'tanstaafl',
-        { a: 1, b: 2, c: 3, d: [false, -42, '!tanstaafl'] },
-      ];
-
-      const s = serify(v, defaultOptions);
-
-      expect(s).toStrictEqual(v);
+      expect(serify(v, defaultOptions)).toStrictEqual({ a: 1 });
     });
   });
 
-  describe('unserializable', () => {
-    it('bigint', () => {
-      const v = 1234567890123456789012345678901234567890n;
-
-      const s = serify(v, defaultOptions);
-
-      expect(s).toStrictEqual({
-        serifyKey: null,
-        type: 'BigInt',
-        value: '1234567890123456789012345678901234567890',
-      });
-    });
-
-    it('date', () => {
-      const v = new Date('2000-01-02T03:04:05.678Z');
-
-      const s = serify(v, defaultOptions);
-
-      expect(s).toStrictEqual({
-        serifyKey: null,
-        type: 'Date',
-        value: 946782245678,
-      });
-    });
-
-    it('map', () => {
-      const v = new Map<unknown, unknown>([
-        ['a', 1],
-        [2, 'b'],
-        ['c', 3],
-      ]);
-
-      const s = serify(v, defaultOptions);
-
-      expect(s).toStrictEqual({
-        serifyKey: null,
-        type: 'Map',
-        value: [
+  describe('default types', () => {
+    it.each([
+      [
+        'BigInt',
+        1234567890123456789012345678901234567890n,
+        '1234567890123456789012345678901234567890',
+      ],
+      ['Date', new Date('2000-01-02T03:04:05.678Z'), 946782245678],
+      [
+        'Map',
+        new Map<unknown, unknown>([
           ['a', 1],
           [2, 'b'],
-          ['c', 3],
-        ],
-      });
-    });
-
-    it('set', () => {
-      const v = new Set(['a', 2, 'c']);
-
-      const s = serify(v, defaultOptions);
-
-      expect(s).toStrictEqual({
-        serifyKey: null,
-        type: 'Set',
-        value: ['a', 2, 'c'],
-      });
-    });
-
-    it('undefined', () => {
-      const v = undefined;
-
-      const s = serify(v, defaultOptions);
-
-      expect(s).toStrictEqual({
-        serifyKey: null,
-        type: 'Undefined',
-        value: null,
-      });
-    });
-
-    it('complex', () => {
-      const v = new Map<unknown, unknown>([
+        ]),
         [
-          1234567890123456789012345678901234567890n,
-          [
-            new Map<unknown, unknown>([
-              ['a', 1],
-              [2, 'b'],
-              ['c', 3],
-            ]),
-            new Set(['a', 2, 'c']),
-          ],
+          ['a', 1],
+          [2, 'b'],
         ],
-        [
-          new Date('2000-01-02T03:04:05.678Z'),
-          [
-            new Set(['d', 5, 'f']),
-            new Map<unknown, unknown>([
-              ['d', 4],
-              [5, 'e'],
-              ['f', undefined],
-            ]),
-          ],
-        ],
-      ]);
-
-      const s = serify(v, defaultOptions);
-
-      expect(s).toStrictEqual({
+      ],
+      ['Set', new Set(['a', 2]), ['a', 2]],
+      ['Undefined', undefined, null],
+    ])('wraps a %s', (type, v, value) => {
+      expect(serify(v, defaultOptions)).toStrictEqual({
         serifyKey: null,
-        type: 'Map',
-        value: [
-          [
-            {
-              serifyKey: null,
-              type: 'BigInt',
-              value: '1234567890123456789012345678901234567890',
-            },
-            [
-              {
-                serifyKey: null,
-                type: 'Map',
-                value: [
-                  ['a', 1],
-                  [2, 'b'],
-                  ['c', 3],
-                ],
-              },
-              { serifyKey: null, type: 'Set', value: ['a', 2, 'c'] },
-            ],
-          ],
-          [
-            { serifyKey: null, type: 'Date', value: 946782245678 },
-            [
-              { serifyKey: null, type: 'Set', value: ['d', 5, 'f'] },
-              {
-                serifyKey: null,
-                type: 'Map',
-                value: [
-                  ['d', 4],
-                  [5, 'e'],
-                  ['f', { serifyKey: null, type: 'Undefined', value: null }],
-                ],
-              },
-            ],
-          ],
-        ],
+        type,
+        value,
       });
     });
 
-    it('null object', () => {
-      const v = Object.create(null) as Record<string, unknown>;
-      v.p = 42n;
+    it('wraps a null-prototype object and serifies its contents', () => {
+      const v = Object.assign(Object.create(null) as object, { p: 42n });
 
-      const s = serify(v, defaultOptions);
-
-      expect(s).toStrictEqual({
+      expect(serify(v, defaultOptions)).toStrictEqual({
         serifyKey: null,
         type: 'NullObject',
         value: { p: { serifyKey: null, type: 'BigInt', value: '42' } },
       });
     });
 
-    it('custom', () => {
-      const v = new Custom(42n);
+    it('serifies nested unserializable values recursively', () => {
+      expect(serify(complexValue(), defaultOptions)).toStrictEqual(
+        complexSerified,
+      );
+    });
 
-      const s = serify(v, customOptions);
+    it('writes the configured serifyKey', () => {
+      expect(serify(42n, { ...defaultOptions, serifyKey: 'k' })).toStrictEqual({
+        serifyKey: 'k',
+        type: 'BigInt',
+        value: '42',
+      });
+    });
+  });
 
-      expect(s).toStrictEqual({
+  describe('custom types', () => {
+    it('identifies a class by its constructor name', () => {
+      expect(serify(new Custom(42n), customOptions)).toStrictEqual({
         serifyKey: null,
         type: 'Custom',
         value: { serifyKey: null, type: 'BigInt', value: '42' },
       });
     });
 
-    it('custom with key', () => {
-      const v = new CustomFoo(42n);
-
-      const s = serify(v, customFooOptions);
-
-      expect(s).toStrictEqual({
+    it('identifies a class by its static type property', () => {
+      expect(serify(new CustomFoo(42n), customFooOptions)).toStrictEqual({
         serifyKey: null,
         type: 'Foo',
         value: { serifyKey: null, type: 'BigInt', value: '42' },
@@ -360,21 +215,35 @@ describe('serify', () => {
     });
   });
 
-  describe('errors', () => {
-    it('invalid serifier', () => {
-      const v = new Custom(42n);
+  describe('type identification', () => {
+    it('ignores an own constructor property holding a function', () => {
+      const v = { constructor: Date, hour: 9 };
 
       expect(() => serify(v, defaultOptions)).toThrow(
-        'unserifiable type: Custom',
+        'unserifiable type: Function',
+      );
+    });
+  });
+
+  describe('errors', () => {
+    it.each([
+      ['a class instance with no configured type', new Custom(42n), 'Custom'],
+      ['a symbol', Symbol('s'), 'Symbol'],
+      ['a function', () => 1, 'Function'],
+      [
+        'an object whose prototype chain has no constructor',
+        Object.create(Object.create(null) as object) as object,
+        'Object',
+      ],
+    ])('throws on %s', (_, v, type) => {
+      expect(() => serify(v, defaultOptions)).toThrow(
+        `unserifiable type: ${type}`,
       );
     });
 
-    it('reports an unserifiable type for an object whose prototype chain has no constructor', () => {
-      const v = Object.create(Object.create(null) as object) as object;
-      Object.defineProperty(v, 'colour', { value: 'teal', enumerable: true });
-
-      expect(() => serify(v, defaultOptions)).toThrow(
-        'unserifiable type: Object',
+    it('throws on an unserifiable value nested in a container', () => {
+      expect(() => serify({ a: [new Custom(1n)] }, defaultOptions)).toThrow(
+        'unserifiable type: Custom',
       );
     });
   });

@@ -1,259 +1,150 @@
-import { inspect } from 'node:util';
-
 import { afterEach, describe, expect, it } from 'vitest';
 
 import { defaultOptions, deserify, serify } from '../';
-import { customOptions } from '../test/Custom';
+import { Custom, customOptions } from '../test/Custom';
 import { CustomFoo, customFooOptions } from '../test/CustomFoo';
+import { complexSerified, complexValue } from '../test/fixtures';
 
 describe('deserify', () => {
-  describe('serializable', () => {
-    it('null', () => {
-      const v = null;
-
-      const d = deserify(v, defaultOptions);
-
-      expect(d).toBe(v);
+  describe('serializable values', () => {
+    it.each([
+      ['null', null],
+      ['a boolean', true],
+      ['a number', 42],
+      ['a string', 'tanstaafl'],
+    ])('returns %s unchanged', (_, v) => {
+      expect(deserify(v, defaultOptions)).toBe(v);
     });
 
-    it('bool', () => {
-      const v = true;
-
-      const d = deserify(v, defaultOptions);
-
-      expect(d).toBe(v);
-    });
-
-    it('number', () => {
-      const v = 42;
-
-      const d = deserify(v, defaultOptions);
-
-      expect(d).toBe(v);
-    });
-
-    it('string', () => {
-      const v = 'tanstaafl';
-
-      const d = deserify(v, defaultOptions);
-
-      expect(d).toBe(v);
-    });
-
-    it('object', () => {
-      const v = { a: 1, b: 2, c: 3 };
-
+    it.each([
+      ['an object', { a: 1, b: 2, c: 3 }],
+      ['an array', [true, 42, 'tanstaafl']],
+      [
+        'a nested structure',
+        [true, 42, 'tanstaafl', { a: 1, d: [false, -42, '!tanstaafl'] }],
+      ],
+    ])('returns an equal clone of %s', (_, v) => {
       const d = deserify(v, defaultOptions);
 
       expect(d).toStrictEqual(v);
-      expect(typeof (d as Record<string, unknown>).constructor).not.toBe(
-        undefined,
-      );
-    });
-
-    it('array', () => {
-      const v = [true, 42, 'tanstaafl'];
-
-      const d = deserify(v, defaultOptions);
-
-      expect(d).toStrictEqual(v);
-    });
-
-    it('complex', () => {
-      const v = [
-        true,
-        42,
-        'tanstaafl',
-        { a: 1, b: 2, c: 3, d: [false, -42, '!tanstaafl'] },
-      ];
-
-      const d = deserify(v, defaultOptions);
-
-      expect(d).toStrictEqual(v);
+      expect(d).not.toBe(v);
     });
   });
 
-  describe('unserializable', () => {
-    it('bigint', () => {
-      const v = {
-        serifyKey: null,
-        type: 'BigInt',
-        value: '1234567890123456789012345678901234567890',
-      };
-
-      const d = deserify(v, defaultOptions);
-
-      expect(inspect(d, false, null)).toBe(
-        '1234567890123456789012345678901234567890n',
-      );
-    });
-
-    it('date', () => {
-      const v = { serifyKey: null, type: 'Date', value: 946753445678 };
-
-      const d = deserify(v, defaultOptions);
-
-      expect(inspect(d, false, null)).toBe('2000-01-01T19:04:05.678Z');
-    });
-
-    it('map', () => {
-      const v = {
-        serifyKey: null,
-        type: 'Map',
-        value: [
+  describe('default types', () => {
+    it.each([
+      [
+        'BigInt',
+        '1234567890123456789012345678901234567890',
+        1234567890123456789012345678901234567890n,
+      ],
+      ['Date', 946782245678, new Date('2000-01-02T03:04:05.678Z')],
+      [
+        'Map',
+        [
           ['a', 1],
           [2, 'b'],
-          ['c', 3],
         ],
-      };
+        new Map<unknown, unknown>([
+          ['a', 1],
+          [2, 'b'],
+        ]),
+      ],
+      ['Set', ['a', 2], new Set(['a', 2])],
+      ['Undefined', null, undefined],
+    ])('restores a %s', (type, value, expected) => {
+      expect(
+        deserify({ serifyKey: null, type, value }, defaultOptions),
+      ).toStrictEqual(expected);
+    });
 
-      const d = deserify(v, defaultOptions);
+    it('restores a null-prototype object and deserifies its contents', () => {
+      const d = deserify(
+        {
+          serifyKey: null,
+          type: 'NullObject',
+          value: { p: { serifyKey: null, type: 'BigInt', value: '42' } },
+        },
+        defaultOptions,
+      );
 
-      expect(inspect(d, false, null)).toBe(
-        `Map(3) { 'a' => 1, 2 => 'b', 'c' => 3 }`,
+      expect(Object.getPrototypeOf(d)).toBeNull();
+      expect({ ...(d as object) }).toStrictEqual({ p: 42n });
+    });
+
+    it('deserifies nested serified values recursively', () => {
+      expect(deserify(complexSerified, defaultOptions)).toStrictEqual(
+        complexValue(),
       );
     });
 
-    it('set', () => {
-      const v = {
-        serifyKey: null,
-        type: 'Set',
-        value: ['a', 2, 'c'],
-      };
+    it('does not mutate its input', () => {
+      const v = structuredClone(complexSerified);
 
-      const d = deserify(v, defaultOptions);
+      deserify(v, defaultOptions);
 
-      expect(inspect(d, false, null)).toBe(`Set(3) { 'a', 2, 'c' }`);
+      expect(v).toStrictEqual(complexSerified);
     });
 
-    it('undefined', () => {
-      const v = {
-        serifyKey: null,
-        type: 'Undefined',
-        value: null,
-      };
+    it('reverses serify after a JSON round trip', () => {
+      const json = JSON.stringify(serify(complexValue(), defaultOptions));
 
-      const d = deserify(v, defaultOptions);
-
-      expect(d).toBe(undefined);
+      expect(
+        deserify(JSON.parse(json) as unknown, defaultOptions),
+      ).toStrictEqual(complexValue());
     });
+  });
 
-    it('complex', () => {
-      const v = {
-        serifyKey: null,
-        type: 'Map',
-        value: [
-          [
-            {
-              serifyKey: null,
-              type: 'BigInt',
-              value: '1234567890123456789012345678901234567890',
-            },
-            [
-              {
-                serifyKey: null,
-                type: 'Map',
-                value: [
-                  ['a', 1],
-                  [2, 'b'],
-                  ['c', 3],
-                ],
-              },
-              { serifyKey: null, type: 'Set', value: ['a', 2, 'c'] },
-            ],
-          ],
-          [
-            { serifyKey: null, type: 'Date', value: 946753445678 },
-            [
-              { serifyKey: null, type: 'Set', value: ['d', 5, 'f'] },
-              {
-                serifyKey: null,
-                type: 'Map',
-                value: [
-                  ['d', 4],
-                  [5, 'e'],
-                  ['f', { serifyKey: null, type: 'Undefined', value: null }],
-                ],
-              },
-            ],
-          ],
-        ],
-      };
-
-      const d = deserify(v, defaultOptions);
-
-      // console.log(inspect(d, false, null));
-
-      expect(inspect(d, false, null)).toBe(
-        `Map(2) {
-  1234567890123456789012345678901234567890n => [ Map(3) { 'a' => 1, 2 => 'b', 'c' => 3 }, Set(3) { 'a', 2, 'c' } ],
-  2000-01-01T19:04:05.678Z => [
-    Set(3) { 'd', 5, 'f' },
-    Map(3) { 'd' => 4, 5 => 'e', 'f' => undefined }
-  ]
-}`,
+  describe('custom types', () => {
+    it('restores a class identified by its constructor name', () => {
+      const d = deserify(
+        {
+          serifyKey: null,
+          type: 'Custom',
+          value: { serifyKey: null, type: 'BigInt', value: '42' },
+        },
+        customOptions,
       );
+
+      expect(d).toStrictEqual(new Custom(42n));
     });
 
-    it('null object', () => {
-      const v = {
-        serifyKey: null,
-        type: 'NullObject',
-        value: { p: { serifyKey: null, type: 'BigInt', value: '42' } },
-      };
-
-      const d = deserify(v, defaultOptions);
-
-      expect(d).toStrictEqual(Object.assign(Object.create(null), { p: 42n }));
-      expect((d as Record<string, unknown>).constructor).toBe(undefined);
-    });
-
-    it('custom', () => {
-      const v = {
-        serifyKey: null,
-        type: 'Custom',
-        value: { serifyKey: null, type: 'BigInt', value: '42' },
-      };
-
-      const d = deserify(v, customOptions);
-
-      expect(inspect(d, false, null)).toBe(`Custom { p: 42n }`);
-    });
-
-    it('unmatched serifyKey', () => {
-      const v = {
-        serifyKey: 42,
-        type: 'Custom',
-        value: { serifyKey: null, type: 'BigInt', value: '42' },
-      };
-
-      const d = deserify(v, customOptions);
-
-      expect(d).toStrictEqual({
-        serifyKey: 42,
-        type: 'Custom',
-        value: 42n,
-      });
-    });
-
-    it('unsupported type', () => {
-      const v = { serifyKey: null, type: 'CustomFoo', value: 42 };
-
-      const d = deserify(v, customOptions);
-
-      expect(d).toStrictEqual(v);
-    });
-
-    it('custom with key', () => {
-      const v = {
-        serifyKey: null,
-        type: 'Foo',
-        value: { serifyKey: null, type: 'BigInt', value: '42' },
-      };
-
-      const d = deserify(v, customFooOptions);
+    it('restores a class identified by its static type property', () => {
+      const d = deserify(
+        {
+          serifyKey: null,
+          type: 'Foo',
+          value: { serifyKey: null, type: 'BigInt', value: '42' },
+        },
+        customFooOptions,
+      );
 
       expect(d).toStrictEqual(new CustomFoo(42n));
+    });
+  });
+
+  describe('values that are not serified values', () => {
+    it.each([
+      ['a mismatched serifyKey', { serifyKey: 42, type: 'Custom', value: 1 }],
+      ['an unsupported type', { serifyKey: null, type: 'CustomFoo', value: 1 }],
+      ['a non-string type', { serifyKey: null, type: 7, value: 1 }],
+      ['a missing value key', { serifyKey: null, type: 'Custom' }],
+      ['a missing serifyKey', { type: 'Custom', value: 1 }],
+    ])('treats an object with %s as a plain object', (_, v) => {
+      expect(deserify(v, customOptions)).toStrictEqual(v);
+    });
+
+    it('still deserifies the contents of an unrecognised object', () => {
+      const d = deserify(
+        {
+          serifyKey: 42,
+          type: 'Custom',
+          value: { serifyKey: null, type: 'BigInt', value: '42' },
+        },
+        customOptions,
+      );
+
+      expect(d).toStrictEqual({ serifyKey: 42, type: 'Custom', value: 42n });
     });
   });
 
