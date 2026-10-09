@@ -5,7 +5,7 @@
  *
  * @module
  */
-import { getType, isAnyObject, isArray, isPlainObject } from 'is-what';
+import { getType, isAnyObject } from 'is-what';
 
 import type { DefaultTypeMap } from '../options/defaultOptions';
 import {
@@ -14,6 +14,7 @@ import {
   type SerifiableTypeMap,
   type SerifyOptions,
 } from '../types';
+import { isContainer, mapContainer } from '../util/mapContainer';
 
 /**
  * Static class property that overrides a class's type identifier in
@@ -98,13 +99,7 @@ export const serify = <M extends SerifiableTypeMap = DefaultTypeMap>(
       value: serify(options.types[valueType].serifier(value), options),
     };
 
-  if (isArray(value)) return value.map((v) => serify(v, options));
-
-  if (isPlainObject(value))
-    // Ensure own keys are defined as ordinary properties & exclude inherited properties
-    return Object.fromEntries(
-      Object.entries(value).map(([k, v]) => [k, serify(v, options)]),
-    );
+  if (isContainer(value)) return mapContainer(value, (v) => serify(v, options));
 
   throw new Error(`unserifiable type: ${valueType}`);
 };

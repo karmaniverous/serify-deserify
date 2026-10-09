@@ -5,8 +5,6 @@
  *
  * @module
  */
-import { isArray, isPlainObject } from 'is-what';
-
 import type { DefaultTypeMap } from '../options/defaultOptions';
 import {
   isSerializablePrimitive,
@@ -14,6 +12,7 @@ import {
   type SerifiableTypeMap,
   type SerifyOptions,
 } from '../types';
+import { isContainer, mapContainer } from '../util/mapContainer';
 
 /**
  * Deserify a value: recursively restore every {@link SerifiedValue} it
@@ -46,13 +45,8 @@ export const deserify = <M extends SerifiableTypeMap = DefaultTypeMap>(
     return options.types[type].deserifier(parsed);
   }
 
-  if (isArray(value)) return value.map((v) => deserify(v, options));
-
-  if (isPlainObject(value))
-    // Ensure own keys are defined as ordinary properties & exclude inherited properties
-    return Object.fromEntries(
-      Object.entries(value).map(([k, v]) => [k, deserify(v, options)]),
-    );
+  if (isContainer(value))
+    return mapContainer(value, (v) => deserify(v, options));
 
   throw new Error(`Value is not deserifiable: ${JSON.stringify(value)}`);
 };
