@@ -24,6 +24,8 @@ To install the package, run this command:
 npm install @karmaniverous/serify-deserify
 ```
 
+This package is ESM-only. CommonJS consumers on Node.js 20.19+ or 22.12+ can still load it with `require()`.
+
 A simple example:
 
 ```js
