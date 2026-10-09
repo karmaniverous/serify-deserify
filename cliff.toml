@@ -1,0 +1,56 @@
+# git-cliff config for @karmaniverous/serify-deserify
+# https://git-cliff.org/docs/configuration
+
+[changelog]
+header = """
+# Changelog
+
+All notable changes to this project will be documented in this file.\n
+"""
+body = """
+{% if version %}\
+    ## [{{ version }}] - {{ timestamp | date(format="%Y-%m-%d") }}
+{% else %}\
+    ## [unreleased]
+{% endif %}\
+{% for group, commits in commits | group_by(attribute="group") %}
+    ### {{ group | striptags | trim | upper_first }}
+    {% for commit in commits %}
+        - {% if commit.scope %}*({{ commit.scope }})* {% endif %}\
+            {% if commit.breaking %}[**breaking**] {% endif %}\
+            {{ commit.message | upper_first }}\
+            {% if commit.remote.pr_number %} \
+                ([#{{ commit.remote.pr_number }}](https://github.com/karmaniverous/serify-deserify/pull/{{ commit.remote.pr_number }}))\
+            {% endif %}\
+    {% endfor %}
+{% endfor %}
+"""
+trim = true
+render_always = true
+
+[git]
+conventional_commits = true
+filter_unconventional = false
+split_commits = false
+commit_parsers = [
+    { message = "^Merge pull request", skip = true },
+    { message = "^Merge branch", skip = true },
+    { message = "^chore: release", skip = true },
+    { message = "^chore\\(deps.*\\)", skip = true },
+    { message = "^feat", group = "<!-- 0 -->🚀 Features" },
+    { message = "^(bug)?fix", group = "<!-- 1 -->🐛 Bug Fixes" },
+    { message = "^hotfix", group = "<!-- 2 -->🔥 Hotfixes" },
+    { message = "^refactor", group = "<!-- 3 -->🔨 Refactoring" },
+    { message = "^perf", group = "<!-- 4 -->⚡ Performance" },
+    { message = "^docs", group = "<!-- 5 -->📚 Documentation" },
+    { message = "^test", group = "<!-- 6 -->🧪 Testing" },
+    { message = "^style", group = "<!-- 7 -->🎨 Styling" },
+    { message = "^ci", group = "<!-- 8 -->🔧 CI" },
+    { message = "^revert", group = "<!-- 9 -->◀️ Reverts" },
+    { message = "^chore", group = "<!-- 10 -->⚙️ Chores" },
+    { message = ".*", group = "<!-- 11 -->💼 Other" },
+]
+filter_commits = false
+tag_pattern = "[0-9].*"
+sort_commits = "oldest"
+topo_order_commits = true

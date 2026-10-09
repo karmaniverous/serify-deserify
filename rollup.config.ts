@@ -1,90 +1,71 @@
+/**
+ * Rollup build config: ESM bundle plus bundled type definitions, written to
+ * `dist/`.
+ *
+ * @module
+ */
+import { createRequire } from 'node:module';
+
+import commonjsPlugin from '@rollup/plugin-commonjs';
+import jsonPlugin from '@rollup/plugin-json';
 import { nodeResolve } from '@rollup/plugin-node-resolve';
-import terserPlugin from '@rollup/plugin-terser';
 import typescriptPlugin from '@rollup/plugin-typescript';
-import type { InputOptions, OutputOptions, RollupOptions } from 'rollup';
+import type { InputOptions, RollupOptions } from 'rollup';
 import dtsPlugin from 'rollup-plugin-dts';
 
-import { packageName } from './src/util/packageName';
+const require = createRequire(import.meta.url);
+type Package = Record<string, Record<string, string> | undefined>;
+const pkg = require('./package.json') as Package;
 
-const outputPath = `dist/index`;
+const outputPath = `dist`;
 
+// Rollup writes bundle outputs; the TS plugin should only transpile.
+// - outputToFilesystem=false avoids outDir/dir validation errors for multi-output builds.
+// - incremental=false avoids TS build-info state referencing transient Rollup config artifacts.
+const typescript = typescriptPlugin({
+  tsconfig: './tsconfig.json',
+  outputToFilesystem: false,
+  // Only compile bundled sources; prevents transient Rollup config artifacts
+  // (e.g. rollup.config-*.mjs) from being pulled into the TS program.
+  include: ['src/**/*.ts'],
+  exclude: ['**/*.test.ts', '**/*.test.tsx', '**/__tests__/**', 'src/test/**'],
+
+  // Override repo tsconfig settings for bundling.
+  noEmit: false,
+  declaration: false,
+  declarationMap: false,
+  incremental: false,
+  allowJs: false,
+  checkJs: false,
+});
+
+/**
+ * Common input options for library builds. Runtime dependencies and peers
+ * are externalized.
+ */
 const commonInputOptions: InputOptions = {
   input: 'src/index.ts',
-  plugins: [nodeResolve(), typescriptPlugin()],
+  external: [
+    ...Object.keys(pkg.dependencies ?? {}),
+    ...Object.keys(pkg.peerDependencies ?? {}),
+    'tslib',
+  ],
+  plugins: [commonjsPlugin(), jsonPlugin(), nodeResolve(), typescript],
 };
 
-const iifeCommonOutputOptions: OutputOptions = {
-  name: packageName ?? 'index',
-};
-
+/** Assemble complete config: library & type definition outputs. */
 const config: RollupOptions[] = [
-  // ESM output.
+  // Library output (ESM).
   {
     ...commonInputOptions,
-    output: [
-      {
-        extend: true,
-        file: `${outputPath}.mjs`,
-        format: 'esm',
-      },
-    ],
+    output: [{ dir: outputPath, extend: true, format: 'esm' }],
   },
 
-  // IIFE output.
+  // Type definitions output (single .d.ts).
   {
-    ...commonInputOptions,
-    output: [
-      {
-        ...iifeCommonOutputOptions,
-        extend: true,
-        file: `${outputPath}.iife.js`,
-        format: 'iife',
-      },
-
-      // Minified IIFE output.
-      {
-        ...iifeCommonOutputOptions,
-        extend: true,
-        file: `${outputPath}.iife.min.js`,
-        format: 'iife',
-        plugins: [terserPlugin()],
-      },
-    ],
-  },
-
-  // CommonJS output.
-  {
-    ...commonInputOptions,
-    output: [
-      {
-        extend: true,
-        file: `${outputPath}.cjs`,
-        format: 'cjs',
-      },
-    ],
-  },
-
-  // Type definitions output.
-  {
-    ...commonInputOptions,
-    plugins: [commonInputOptions.plugins, dtsPlugin()],
-    output: [
-      {
-        extend: true,
-        file: `${outputPath}.d.ts`,
-        format: 'esm',
-      },
-      {
-        extend: true,
-        file: `${outputPath}.d.mts`,
-        format: 'esm',
-      },
-      {
-        extend: true,
-        file: `${outputPath}.d.cts`,
-        format: 'cjs',
-      },
-    ],
+    input: 'src/index.ts',
+    output: [{ file: `${outputPath}/index.d.ts`, format: 'esm' }],
+    plugins: [dtsPlugin()],
   },
 ];
 

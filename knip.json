@@ -1,0 +1,14 @@
+{
+  "entry": ["src/**/index.ts"],
+  "ignoreUnresolved": [
+    "typescript={incremental:false,outputToFilesystem:false}"
+  ],
+  "project": ["*/**", "!docs/**"],
+  "rules": {
+    "exports": "off",
+    "types": "off"
+  },
+  "vitest": {
+    "entry": ["*/**/*.test.!(*.*)"]
+  }
+}

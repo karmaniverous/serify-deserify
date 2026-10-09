@@ -1,267 +1,137 @@
-/* eslint-env mocha */
+import { afterEach, describe, expect, it } from 'vitest';
 
-import { expect } from 'chai';
-
-import { defaultOptions, serify } from '../';
+import {
+  defaultOptions,
+  serify,
+  type SerifyOptions,
+  serifyStaticTypeProperty,
+} from '../';
 import { Custom, customOptions } from '../test/Custom';
 import { CustomFoo, customFooOptions } from '../test/CustomFoo';
+import { complexSerified, complexValue } from '../test/fixtures';
 
-describe('serify', function () {
-  describe('serializable', function () {
-    it('null', function () {
-      const v = null;
+/** Options supporting only `BigInt`: no `Number`, `Custom`, etc. */
+const bigIntOnlyOptions: SerifyOptions<{ BigInt: [bigint, string] }> = {
+  serifyKey: null,
+  types: { BigInt: defaultOptions.types.BigInt },
+};
+
+describe('serify', () => {
+  describe('serializable values', () => {
+    it.each([
+      ['null', null],
+      ['a boolean', true],
+      ['a number', 42],
+      ['a string', 'tanstaafl'],
+    ])('returns %s unchanged', (_, v) => {
+      expect(serify(v, defaultOptions)).toBe(v);
+    });
+
+    it.each([
+      ['an object', { a: 1, b: 2, c: 3 }],
+      ['an array', [true, 42, 'tanstaafl']],
+      [
+        'a nested structure',
+        [true, 42, 'tanstaafl', { a: 1, d: [false, -42, '!tanstaafl'] }],
+      ],
+    ])('returns an equal clone of %s', (_, v) => {
+      const s = serify(v, defaultOptions);
+
+      expect(s).toStrictEqual(v);
+      expect(s).not.toBe(v);
+    });
+
+    it('does not mutate a frozen input', () => {
+      const v = Object.freeze({ a: 1, c: Object.freeze({ d: 2n }) });
 
       const s = serify(v, defaultOptions);
 
-      expect(s).to.equal(v);
-    });
-
-    it('bool', function () {
-      const v = true;
-
-      const s = serify(v, defaultOptions);
-
-      expect(s).to.equal(v);
-    });
-
-    it('number', function () {
-      const v = 42;
-
-      const s = serify(v, defaultOptions);
-
-      expect(s).to.equal(v);
-    });
-
-    it('string', function () {
-      const v = 'tanstaafl';
-
-      const s = serify(v, defaultOptions);
-
-      expect(s).to.equal(v);
-    });
-
-    it('object', function () {
-      const v = { a: 1, b: 2, c: 3 };
-
-      const s = serify(v, defaultOptions);
-
-      expect(s).to.deep.equal(v);
-    });
-
-    it('frozen property', function () {
-      const v = { a: 1, b: 2, c: { a: 1, b: 2, c: 3 } };
-      Object.freeze(v.c);
-
-      const s = serify(v, defaultOptions);
-
-      expect(s).to.deep.equal(v);
-    });
-
-    it('unwritable property', function () {
-      const v = { a: 1, b: 2, c: 3 };
-
-      Object.defineProperty(v, 'd', {
-        value: [1, 2, 3],
-        writable: false,
+      expect(s).toStrictEqual({
+        a: 1,
+        c: { d: { serifyKey: null, type: 'BigInt', value: '2' } },
       });
-
-      const s = serify(v, defaultOptions);
-
-      expect(s).to.deep.equal(v);
+      expect(v.c.d).toBe(2n);
     });
 
-    it('array', function () {
-      const v = [true, 42, 'tanstaafl'];
+    it('omits non-enumerable properties', () => {
+      const v = { a: 1 };
+      Object.defineProperty(v, 'd', { value: [1, 2, 3], writable: false });
 
-      const s = serify(v, defaultOptions);
-
-      expect(s).to.deep.equal(v);
-    });
-
-    it('complex', function () {
-      const v = [
-        true,
-        42,
-        'tanstaafl',
-        { a: 1, b: 2, c: 3, d: [false, -42, '!tanstaafl'] },
-      ];
-
-      const s = serify(v, defaultOptions);
-
-      expect(s).to.deep.equal(v);
+      expect(serify(v, defaultOptions)).toStrictEqual({ a: 1 });
     });
   });
 
-  describe('unserializable', function () {
-    it('bigint', function () {
-      const v = 1234567890123456789012345678901234567890n;
-
-      const s = serify(v, defaultOptions);
-
-      expect(s).to.deep.equal({
-        serifyKey: null,
-        type: 'BigInt',
-        value: '1234567890123456789012345678901234567890',
-      });
-    });
-
-    it('date', function () {
-      const v = new Date('2000-01-02T03:04:05.678Z');
-
-      const s = serify(v, defaultOptions);
-
-      expect(s).to.deep.equal({
-        serifyKey: null,
-        type: 'Date',
-        value: 946782245678,
-      });
-    });
-
-    it('map', function () {
-      const v = new Map<unknown, unknown>([
-        ['a', 1],
-        [2, 'b'],
-        ['c', 3],
-      ]);
-
-      const s = serify(v, defaultOptions);
-
-      expect(s).to.deep.equal({
-        serifyKey: null,
-        type: 'Map',
-        value: [
+  describe('default types', () => {
+    it.each([
+      [
+        'BigInt',
+        1234567890123456789012345678901234567890n,
+        '1234567890123456789012345678901234567890',
+      ],
+      ['Date', new Date('2000-01-02T03:04:05.678Z'), 946782245678],
+      [
+        'Map',
+        new Map<unknown, unknown>([
           ['a', 1],
           [2, 'b'],
-          ['c', 3],
-        ],
-      });
-    });
-
-    it('set', function () {
-      const v = new Set(['a', 2, 'c']);
-
-      const s = serify(v, defaultOptions);
-
-      expect(s).to.deep.equal({
-        serifyKey: null,
-        type: 'Set',
-        value: ['a', 2, 'c'],
-      });
-    });
-
-    it('undefined', function () {
-      const v = undefined;
-
-      const s = serify(v, defaultOptions);
-
-      expect(s).to.deep.equal({
-        serifyKey: null,
-        type: 'Undefined',
-        value: null,
-      });
-    });
-
-    it('complex', function () {
-      const v = new Map<unknown, unknown>([
+        ]),
         [
-          1234567890123456789012345678901234567890n,
-          [
-            new Map<unknown, unknown>([
-              ['a', 1],
-              [2, 'b'],
-              ['c', 3],
-            ]),
-            new Set(['a', 2, 'c']),
-          ],
+          ['a', 1],
+          [2, 'b'],
         ],
-        [
-          new Date('2000-01-02T03:04:05.678Z'),
-          [
-            new Set(['d', 5, 'f']),
-            new Map<unknown, unknown>([
-              ['d', 4],
-              [5, 'e'],
-              ['f', undefined],
-            ]),
-          ],
-        ],
-      ]);
+      ],
+      ['Set', new Set(['a', 2]), ['a', 2]],
+      ['Undefined', undefined, null],
+      ['Number (NaN)', NaN, 'NaN'],
+      ['Number (Infinity)', Infinity, 'Infinity'],
+      ['Number (-Infinity)', -Infinity, '-Infinity'],
+      ['Number (-0)', -0, '-0'],
+    ])('wraps a %s', (label, v, value) => {
+      const type = label.split(' ')[0];
 
-      const s = serify(v, defaultOptions);
-
-      expect(s).to.deep.equal({
+      expect(serify(v, defaultOptions)).toStrictEqual({
         serifyKey: null,
-        type: 'Map',
-        value: [
-          [
-            {
-              serifyKey: null,
-              type: 'BigInt',
-              value: '1234567890123456789012345678901234567890',
-            },
-            [
-              {
-                serifyKey: null,
-                type: 'Map',
-                value: [
-                  ['a', 1],
-                  [2, 'b'],
-                  ['c', 3],
-                ],
-              },
-              { serifyKey: null, type: 'Set', value: ['a', 2, 'c'] },
-            ],
-          ],
-          [
-            { serifyKey: null, type: 'Date', value: 946782245678 },
-            [
-              { serifyKey: null, type: 'Set', value: ['d', 5, 'f'] },
-              {
-                serifyKey: null,
-                type: 'Map',
-                value: [
-                  ['d', 4],
-                  [5, 'e'],
-                  ['f', { serifyKey: null, type: 'Undefined', value: null }],
-                ],
-              },
-            ],
-          ],
-        ],
+        type,
+        value,
       });
     });
 
-    it('null object', function () {
-      const v = Object.create(null) as Record<string, unknown>;
-      v.p = 42n;
+    it('wraps a null-prototype object and serifies its contents', () => {
+      const v = Object.assign(Object.create(null) as object, { p: 42n });
 
-      const s = serify(v, defaultOptions);
-
-      expect(s).to.deep.equal({
+      expect(serify(v, defaultOptions)).toStrictEqual({
         serifyKey: null,
         type: 'NullObject',
         value: { p: { serifyKey: null, type: 'BigInt', value: '42' } },
       });
     });
 
-    it('custom', function () {
-      const v = new Custom(42n);
+    it('serifies nested unserializable values recursively', () => {
+      expect(serify(complexValue(), defaultOptions)).toStrictEqual(
+        complexSerified,
+      );
+    });
 
-      const s = serify(v, customOptions);
+    it('writes the configured serifyKey', () => {
+      expect(serify(42n, { ...defaultOptions, serifyKey: 'k' })).toStrictEqual({
+        serifyKey: 'k',
+        type: 'BigInt',
+        value: '42',
+      });
+    });
+  });
 
-      expect(s).to.deep.equal({
+  describe('custom types', () => {
+    it('identifies a class by its constructor name', () => {
+      expect(serify(new Custom(42n), customOptions)).toStrictEqual({
         serifyKey: null,
         type: 'Custom',
         value: { serifyKey: null, type: 'BigInt', value: '42' },
       });
     });
 
-    it('custom with key', function () {
-      const v = new CustomFoo(42n);
-
-      const s = serify(v, customFooOptions);
-
-      expect(s).to.deep.equal({
+    it('identifies a class by its static type property', () => {
+      expect(serify(new CustomFoo(42n), customFooOptions)).toStrictEqual({
         serifyKey: null,
         type: 'Foo',
         value: { serifyKey: null, type: 'BigInt', value: '42' },
@@ -269,13 +139,13 @@ describe('serify', function () {
     });
   });
 
-  describe('object keys', function () {
-    afterEach(function () {
+  describe('object keys', () => {
+    afterEach(() => {
       // Clean up below polluted test
       delete (Object.prototype as Record<string, unknown>).polluted;
     });
 
-    it('preserves a custom __proto__ key on a plain object', function () {
+    it('preserves a custom __proto__ key on a plain object', () => {
       const v = {};
       Object.defineProperty(v, 'name', { value: 'plain', enumerable: true });
       Object.defineProperty(v, '__proto__', {
@@ -285,12 +155,12 @@ describe('serify', function () {
 
       const s = serify(v, defaultOptions);
 
-      expect(JSON.stringify(s)).to.equal(
+      expect(JSON.stringify(s)).toBe(
         '{"name":"plain","__proto__":{"colour":"red"}}',
       );
     });
 
-    it('preserves a custom __proto__ key on a null object', function () {
+    it('preserves a custom __proto__ key on a null object', () => {
       const v = Object.create(null) as object;
       Object.defineProperty(v, 'count', { value: 3, enumerable: true });
       Object.defineProperty(v, '__proto__', {
@@ -300,20 +170,20 @@ describe('serify', function () {
 
       const s = serify(v, defaultOptions);
 
-      expect(JSON.stringify(s)).to.equal(
+      expect(JSON.stringify(s)).toBe(
         '{"serifyKey":null,"type":"NullObject","value":{"count":3,"__proto__":{"size":"large"}}}',
       );
     });
 
-    it('does not overwrite the output prototype from a custom __proto__ key', function () {
+    it('does not overwrite the output prototype from a custom __proto__ key', () => {
       const v = JSON.parse('{"__proto__":{"shape":"circle"}}') as object;
 
       const s = serify(v, defaultOptions);
 
-      expect(Object.getPrototypeOf(s)).to.equal(Object.prototype);
+      expect(Object.getPrototypeOf(s)).toBe(Object.prototype);
     });
 
-    it('excludes enumerable keys inherited from Object.prototype', function () {
+    it('excludes enumerable keys inherited from Object.prototype', () => {
       Object.defineProperty(Object.prototype, 'polluted', {
         value: 'polluted value',
         enumerable: true,
@@ -323,18 +193,18 @@ describe('serify', function () {
 
       const s = serify({ id: 7 }, defaultOptions);
 
-      expect(Object.keys(s as object)).to.deep.equal(['id']);
+      expect(Object.keys(s as object)).toStrictEqual(['id']);
     });
 
-    it('preserves a custom constructor key holding a string on a plain object', function () {
+    it('preserves a custom constructor key holding a string on a plain object', () => {
       const v = JSON.parse('{"constructor":"widget","price":5}') as unknown;
 
       const s = serify(v, defaultOptions);
 
-      expect(JSON.stringify(s)).to.equal('{"constructor":"widget","price":5}');
+      expect(JSON.stringify(s)).toBe('{"constructor":"widget","price":5}');
     });
 
-    it('preserves a custom constructor key holding a string on a null object', function () {
+    it('preserves a custom constructor key holding a string on a null object', () => {
       const v = Object.create(null) as object;
       Object.defineProperty(v, 'constructor', {
         value: 'gadget',
@@ -344,41 +214,65 @@ describe('serify', function () {
 
       const s = serify(v, defaultOptions);
 
-      expect(JSON.stringify(s)).to.equal(
+      expect(JSON.stringify(s)).toBe(
         '{"serifyKey":null,"type":"NullObject","value":{"constructor":"gadget","stock":8}}',
       );
     });
 
-    it('does not choose the serifier from a custom constructor key', function () {
+    it('does not choose the serifier from a custom constructor key', () => {
       const v = JSON.parse(
         '{"constructor":{"name":"Date"},"hour":9}',
       ) as unknown;
 
       const s = serify(v, defaultOptions);
 
-      expect(JSON.stringify(s)).to.equal(
+      expect(JSON.stringify(s)).toBe(
         '{"constructor":{"name":"Date"},"hour":9}',
       );
     });
   });
 
-  describe('errors', function () {
-    it('invalid serifier', function () {
-      const v = new Custom(42n);
+  describe('type identification', () => {
+    it('does not match a type key inherited from Object.prototype', () => {
+      class Sneaky {
+        static [serifyStaticTypeProperty] = 'hasOwnProperty';
+        readonly id = 1;
+      }
 
-      expect(() => serify(v, defaultOptions)).to.throw(
-        Error,
-        'unserifiable type: Custom',
+      expect(() => serify(new Sneaky(), defaultOptions)).toThrow(
+        'unserifiable type: hasOwnProperty',
       );
     });
 
-    it('reports an unserifiable type for an object whose prototype chain has no constructor', function () {
-      const v = Object.create(Object.create(null) as object) as object;
-      Object.defineProperty(v, 'colour', { value: 'teal', enumerable: true });
+    it('ignores an own constructor property holding a function', () => {
+      const v = { constructor: Date, hour: 9 };
 
-      expect(() => serify(v, defaultOptions)).to.throw(
-        Error,
-        'unserifiable type: Object',
+      expect(() => serify(v, defaultOptions)).toThrow(
+        'unserifiable type: Function',
+      );
+    });
+  });
+
+  describe('errors', () => {
+    it.each([
+      ['a class instance with no configured type', new Custom(42n), 'Custom'],
+      ['a symbol', Symbol('s'), 'Symbol'],
+      ['a non-JSON number with no Number type configured', Infinity, 'Number'],
+      ['a function', () => 1, 'Function'],
+      [
+        'an object whose prototype chain has no constructor',
+        Object.create(Object.create(null) as object) as object,
+        'Object',
+      ],
+    ])('throws on %s', (_, v, type) => {
+      expect(() => serify(v, bigIntOnlyOptions)).toThrow(
+        `unserifiable type: ${type}`,
+      );
+    });
+
+    it('throws on an unserifiable value nested in a container', () => {
+      expect(() => serify({ a: [new Custom(1n)] }, defaultOptions)).toThrow(
+        'unserifiable type: Custom',
       );
     });
   });

@@ -1,0 +1,39 @@
+{
+  "entryPoints": ["./src/index.ts"],
+  "highlightLanguages": [
+    "bash",
+    "console",
+    "css",
+    "html",
+    "javascript",
+    "json",
+    "jsonc",
+    "json5",
+    "md",
+    "tsx",
+    "typescript",
+    "yaml",
+    "yml"
+  ],
+  "hostedBaseUrl": "https://docs.karmanivero.us/serify-deserify",
+  "navigationLinks": {
+    "GitHub": "https://github.com/karmaniverous/serify-deserify"
+  },
+  "out": "./docs/",
+  "plugin": ["typedoc-plugin-mdn-links", "typedoc-plugin-replace-text"],
+  "projectDocuments": ["./CHANGELOG.md"],
+  "replaceText": {
+    "replacements": [
+      {
+        "pattern": "<!-- TYPEDOC_EXCLUDE -->.*?<!-- /TYPEDOC_EXCLUDE -->",
+        "flags": "gis",
+        "replace": ""
+      }
+    ]
+  },
+  "searchInComments": true,
+  "searchInDocuments": true,
+  "validation": {
+    "notDocumented": true
+  }
+}
