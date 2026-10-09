@@ -1,14 +1,13 @@
-/* eslint-env mocha */
-
 import {
   combineReducers,
   configureStore,
   createSlice,
-  PayloadAction,
+  type MiddlewareAPI,
+  type PayloadAction,
 } from '@reduxjs/toolkit';
-import { expect } from 'chai';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { createReduxMiddleware, serify } from '../';
+import { createReduxMiddleware, defaultOptions, serify } from '../';
 import { Custom, customOptions } from '../test/Custom';
 
 // Create state type.
@@ -46,75 +45,73 @@ const store = configureStore({
 
 // Get redux functions.
 const { setValue } = testSlice.actions;
-// eslint-disable-next-line @typescript-eslint/unbound-method
-const { dispatch, getState } = store;
 
 // Dispatch a value into the Redux store and retrieve its serified form.
 const bounceValue = (v: unknown) => {
-  dispatch(setValue(v));
+  store.dispatch(setValue(v));
 
   const {
     test: { value },
-  } = getState();
+  } = store.getState();
 
   return value;
 };
 
-describe('redux', function () {
-  beforeEach(function () {
-    dispatch(setValue(null));
+describe('redux', () => {
+  beforeEach(() => {
+    store.dispatch(setValue(null));
   });
 
-  describe('serializable', function () {
-    it('null', function () {
+  describe('serializable', () => {
+    it('null', () => {
       const v = null;
 
       const s = bounceValue(v);
 
-      expect(s).to.equal(serify(v, customOptions));
+      expect(s).toBe(serify(v, customOptions));
     });
 
-    it('bool', function () {
+    it('bool', () => {
       const v = true;
 
       const s = bounceValue(v);
 
-      expect(s).to.equal(serify(v, customOptions));
+      expect(s).toBe(serify(v, customOptions));
     });
 
-    it('number', function () {
+    it('number', () => {
       const v = 42;
 
       const s = bounceValue(v);
 
-      expect(s).to.equal(serify(v, customOptions));
+      expect(s).toBe(serify(v, customOptions));
     });
 
-    it('string', function () {
+    it('string', () => {
       const v = 'tanstaafl';
 
       const s = bounceValue(v);
 
-      expect(s).to.equal(serify(v, customOptions));
+      expect(s).toBe(serify(v, customOptions));
     });
 
-    it('object', function () {
+    it('object', () => {
       const v = { a: 1, b: 2, c: 3 };
 
       const s = bounceValue(v);
 
-      expect(s).to.deep.equal(serify(v, customOptions));
+      expect(s).toStrictEqual(serify(v, customOptions));
     });
 
-    it('array', function () {
+    it('array', () => {
       const v = [true, 42, 'tanstaafl'];
 
       const s = bounceValue(v);
 
-      expect(s).to.deep.equal(serify(v, customOptions));
+      expect(s).toStrictEqual(serify(v, customOptions));
     });
 
-    it('complex', function () {
+    it('complex', () => {
       const v = [
         true,
         42,
@@ -124,28 +121,28 @@ describe('redux', function () {
 
       const s = bounceValue(v);
 
-      expect(s).to.deep.equal(serify(v, customOptions));
+      expect(s).toStrictEqual(serify(v, customOptions));
     });
   });
 
-  describe('unserializable', function () {
-    it('bigint', function () {
+  describe('unserializable', () => {
+    it('bigint', () => {
       const v = 1234567890123456789012345678901234567890n;
 
       const s = bounceValue(v);
 
-      expect(s).to.deep.equal(serify(v, customOptions));
+      expect(s).toStrictEqual(serify(v, customOptions));
     });
 
-    it('date', function () {
+    it('date', () => {
       const v = new Date('2000-01-02T03:04:05.678Z');
 
       const s = bounceValue(v);
 
-      expect(s).to.deep.equal(serify(v, customOptions));
+      expect(s).toStrictEqual(serify(v, customOptions));
     });
 
-    it('map', function () {
+    it('map', () => {
       const v = new Map<unknown, unknown>([
         ['a', 1],
         [2, 'b'],
@@ -154,26 +151,26 @@ describe('redux', function () {
 
       const s = bounceValue(v);
 
-      expect(s).to.deep.equal(serify(v, customOptions));
+      expect(s).toStrictEqual(serify(v, customOptions));
     });
 
-    it('set', function () {
+    it('set', () => {
       const v = new Set(['a', 2, 'c']);
 
       const s = bounceValue(v);
 
-      expect(s).to.deep.equal(serify(v, customOptions));
+      expect(s).toStrictEqual(serify(v, customOptions));
     });
 
-    it('undefined', function () {
+    it('undefined', () => {
       const v = undefined;
 
       const s = bounceValue(v);
 
-      expect(s).to.deep.equal(serify(v, customOptions));
+      expect(s).toStrictEqual(serify(v, customOptions));
     });
 
-    it('complex', function () {
+    it('complex', () => {
       const v = new Map<unknown, unknown>([
         [
           1234567890123456789012345678901234567890n,
@@ -201,15 +198,41 @@ describe('redux', function () {
 
       const s = bounceValue(v);
 
-      expect(s).to.deep.equal(serify(v, customOptions));
+      expect(s).toStrictEqual(serify(v, customOptions));
     });
 
-    it('custom', function () {
+    it('custom', () => {
       const v = new Custom(42n);
 
       const s = bounceValue(v);
 
-      expect(s).to.deep.equal(serify(v, customOptions));
+      expect(s).toStrictEqual(serify(v, customOptions));
+    });
+  });
+});
+
+describe('createReduxMiddleware', () => {
+  it('passes non-object actions through untouched', () => {
+    const api: MiddlewareAPI = { dispatch: vi.fn(), getState: vi.fn() };
+    const next = vi.fn();
+
+    createReduxMiddleware(defaultOptions)(api)(next)(42n);
+
+    expect(next).toHaveBeenCalledExactlyOnceWith(42n);
+  });
+
+  it('serifies the payload of object actions', () => {
+    const api: MiddlewareAPI = { dispatch: vi.fn(), getState: vi.fn() };
+    const next = vi.fn();
+
+    createReduxMiddleware(defaultOptions)(api)(next)({
+      type: 'test',
+      payload: 42n,
+    });
+
+    expect(next).toHaveBeenCalledExactlyOnceWith({
+      type: 'test',
+      payload: serify(42n, defaultOptions),
     });
   });
 });

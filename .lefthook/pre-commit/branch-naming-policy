@@ -2,18 +2,24 @@
 #!/bin/sh
 
 BRANCH=$(git rev-parse --abbrev-ref HEAD)
-REGEX="^(head|main|(bugfix|chore|docs|feature|hotfix)\/[-_a-zA-Z0-9]+|release\/[0-9]+\.[0-9]+\.[0-9]+)(-[_a-zA-Z0-9]+)?$"
+REGEX="^(head|main|(bugfix|chore|ci|docs|feature|hotfix|perf|refactor|revert|style|test)\/[-_a-zA-Z0-9]+|release\/[0-9]+\.[0-9]+\.[0-9]+)(-[_a-zA-Z0-9]+)?$"
 
 if ! [[ $BRANCH =~ $REGEX ]]; then
   echo "$BRANCH"
   echo ""
   echo "Invalid branch name. Valid patterns:"
   echo "- main"
-  echo "- bugfix/[-_a-zA-Z0-9]+"
-  echo "- chore/[-_a-zA-Z0-9]+"
-  echo "- docs/[-_a-zA-Z0-9]+"
-  echo "- feature/[-_a-zA-Z0-9]+"
-  echo "- hotfix/[-_a-zA-Z0-9]+"
+  echo "- bugfix/[-_a-zA-Z0-9]+     Bug fixes"
+  echo "- chore/[-_a-zA-Z0-9]+     Maintenance & config"
+  echo "- ci/[-_a-zA-Z0-9]+        CI/CD pipeline changes"
+  echo "- docs/[-_a-zA-Z0-9]+      Documentation"
+  echo "- feature/[-_a-zA-Z0-9]+   New features"
+  echo "- hotfix/[-_a-zA-Z0-9]+    Urgent production fixes"
+  echo "- perf/[-_a-zA-Z0-9]+      Performance improvements"
+  echo "- refactor/[-_a-zA-Z0-9]+  Code refactoring"
+  echo "- revert/[-_a-zA-Z0-9]+    Revert previous changes"
+  echo "- style/[-_a-zA-Z0-9]+     Code style & formatting"
+  echo "- test/[-_a-zA-Z0-9]+      Test additions & fixes"
   echo "- release/{semantic version}"
   exit 1
 fi

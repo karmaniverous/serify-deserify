@@ -1,3 +1,9 @@
+/**
+ * {@link createReduxMiddleware}: builds Redux middleware that serifies the
+ * `payload` of every dispatched action. Mutates the dispatched action object.
+ *
+ * @module
+ */
 import type { Middleware } from '@reduxjs/toolkit';
 import { isAnyObject } from 'is-what';
 
@@ -5,13 +11,28 @@ import { serify } from '../serify/serify';
 import type { SerifiableTypeMap, SerifyOptions } from '../types';
 
 /**
- * create redux middleware
+ * Create Redux middleware that {@link serify | serifies} the `payload` of
+ * every dispatched action before it reaches the reducers.
+ *
+ * @remarks
+ * Values retrieved from the store remain serified; restore them with
+ * {@link deserify} (e.g. by wrapping your selectors).
+ *
+ * @typeParam M - The {@link SerifiableTypeMap} describing supported types.
+ * @param options - The {@link SerifyOptions} in effect.
+ * @returns Redux middleware.
+ *
+ * @example
+ * ```ts
+ * const store = configureStore({
+ *   reducer,
+ *   middleware: (getDefaultMiddleware) =>
+ *     getDefaultMiddleware().concat(createReduxMiddleware(defaultOptions)),
+ * });
+ * ```
  */
 export const createReduxMiddleware =
-  <M extends SerifiableTypeMap>(
-    options: SerifyOptions<M>,
-    // eslint-disable-next-line @typescript-eslint/ban-types
-  ): Middleware =>
+  <M extends SerifiableTypeMap>(options: SerifyOptions<M>): Middleware =>
   () =>
   (next) =>
   (action) => {

@@ -1,6 +1,13 @@
+/**
+ * {@link deserify}: recursively restores a value produced by {@link serify}
+ * (typically after a `JSON.stringify`/`JSON.parse` round trip), using the type
+ * callbacks in {@link SerifyOptions}. Pure; never mutates its input.
+ *
+ * @module
+ */
 import { isArray, isPlainObject } from 'is-what';
 
-import { type DefaultTypeMap } from '../options/defaultOptions';
+import type { DefaultTypeMap } from '../options/defaultOptions';
 import {
   isSerializablePrimitive,
   isSerifiedValue,
@@ -9,8 +16,23 @@ import {
 } from '../types';
 
 /**
- * Deserify a value. Does not mutate the original value. Implicitly assumes
- * that the value is composed entirely of types serializable by JSON.stringify.
+ * Deserify a value: recursively restore every {@link SerifiedValue} it
+ * contains to its original type.
+ *
+ * @typeParam M - The {@link SerifiableTypeMap} describing supported types.
+ * @param value - The value to deserify. Implicitly assumed to be composed
+ * entirely of types serializable by `JSON.stringify`.
+ * @param options - The {@link SerifyOptions} in effect. Must match those used
+ * to serify the value.
+ * @returns The deserified value. Arrays & plain objects are cloned; the input
+ * is never mutated.
+ * @throws `Error` if `value` (or any value it contains) is not deserifiable.
+ *
+ * @example
+ * ```ts
+ * deserify({ serifyKey: null, type: 'BigInt', value: '42' }, defaultOptions);
+ * // 42n
+ * ```
  */
 export const deserify = <M extends SerifiableTypeMap = DefaultTypeMap>(
   value: unknown,

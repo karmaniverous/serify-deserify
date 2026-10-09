@@ -1,7 +1,12 @@
 .nyc_output/
-coverage/
-dist/
-esm/
-node_modules/
 .rollup.cache/
 .tsbuildinfo
+*.local
+local/
+coverage/
+dist/
+docs/
+esm/
+node_modules/
+context/
+

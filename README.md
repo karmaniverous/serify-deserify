@@ -1,3 +1,7 @@
+# serify-deserify
+
+[![npm version](https://img.shields.io/npm/v/@karmaniverous/serify-deserify.svg)](https://www.npmjs.com/package/@karmaniverous/serify-deserify) ![Node Current](https://img.shields.io/node/v/@karmaniverous/serify-deserify) <!-- TYPEDOC_EXCLUDE --> [![docs](https://img.shields.io/badge/docs-website-blue)](https://docs.karmanivero.us/serify-deserify) [![changelog](https://img.shields.io/badge/changelog-latest-blue.svg)](https://github.com/karmaniverous/serify-deserify/tree/main/CHANGELOG.md)<!-- /TYPEDOC_EXCLUDE --> [![license](https://img.shields.io/badge/license-BSD--3--Clause-blue.svg)](https://github.com/karmaniverous/serify-deserify/tree/main/LICENSE)
+
 <p align="center"><img src="./assets/flowchart.png"></p>
 
 **serify** - reversibly transform an unserializable value into a serializable one
@@ -39,9 +43,9 @@ const deserified = deserify(serified, defaultOptions);
 // 42n
 ```
 
-Review the unit tests for more examples of how to use [`serify`](./src/serify/serify.test.ts) and [`deserify`](./src/deserify/deserify.test.ts).
+Review the unit tests for more examples of how to use [`serify`](https://github.com/karmaniverous/serify-deserify/tree/main/src/serify/serify.test.ts) and [`deserify`](https://github.com/karmaniverous/serify-deserify/tree/main/src/deserify/deserify.test.ts).
 
-See the [`createReduxMiddleware` unit tests](./src/createReduxMiddleware/createReduxMiddleware.test.ts) for a fully worked out example of how to configure & integrate the Redux middleware.
+See the [`createReduxMiddleware` unit tests](https://github.com/karmaniverous/serify-deserify/tree/main/src/createReduxMiddleware/createReduxMiddleware.test.ts) for a fully worked out example of how to configure & integrate the Redux middleware.
 
 ## Serifiable Types
 
@@ -68,7 +72,7 @@ Consider the highly unlikely event that some data you want to `deserify` contain
 }
 ```
 
-If you are using the [default configuration](./src/options/defaultOptions.ts) (which does not support a `Foo` type), `deserify` will attempt to deserify this object and your process will either fail or produce an incorrect result.
+If you are using the [default configuration](https://github.com/karmaniverous/serify-deserify/tree/main/src/options/defaultOptions.ts) (which does not support a `Foo` type), `deserify` will attempt to deserify this object and your process will either fail or produce an incorrect result.
 
 In this case, simply add a non-null `serifyKey` of a serifiable primitive type (meaning a `boolean`, `number`, or `string`) to your `options` object, and everything will work again.
 
@@ -78,7 +82,7 @@ In this case, simply add a non-null `serifyKey` of a serifiable primitive type (
 
 ### Default Configuration
 
-Out of the box, the [`defaultOptions`](./src/options/defaultOptions.ts) object supports the `BigInt`, `Date`, `Map`, `Set`, and `unknown` types.
+Out of the box, the [`defaultOptions`](https://github.com/karmaniverous/serify-deserify/tree/main/src/options/defaultOptions.ts) object supports the `BigInt`, `Date`, `Map`, `Set`, and `unknown` types.
 
 If you only need the default configuration, simply import the `defaultOptions` object and pass it to `serify` and `deserify`:
 
@@ -193,7 +197,7 @@ const deserified = deserify(serified, customOptions);
 
 `serify-deserify` is fully type-safe. If you are using TypeScript, you can define your custom types and options objects with full type checking.
 
-This is accomplished by defining a special _type map_ interface that maps a type's name to its types before and after serification. See [`defaultOptions.ts`](./src/options/defaultOptions.ts) to review the default configuration as an example.
+This is accomplished by defining a special _type map_ interface that maps a type's name to its types before and after serification. See [`defaultOptions.ts`](https://github.com/karmaniverous/serify-deserify/tree/main/src/options/defaultOptions.ts) to review the default configuration as an example.
 
 Here's the last example again, but with TypeScript:
 
@@ -249,7 +253,7 @@ In the [Custom Configuration](#custom-configuration) example above, the `Custom`
 
 What if the `Custom` class contained a property that was itself not serializable? This is the case with the `Map` class, which can contain keys and values of any type, including unserializable ones.
 
-If you look at the [`defaultOptions`](./src/options/defaultOptions.ts) object, you'll see that the `Map` type's `serifier` and `deserfier` functions are quite simple:
+If you look at the [`defaultOptions`](https://github.com/karmaniverous/serify-deserify/tree/main/src/options/defaultOptions.ts) object, you'll see that the `Map` type's `serifier` and `deserfier` functions are quite simple:
 
 ```ts
 export interface DefaultTypeMap extends SerifiableTypeMap {
@@ -274,16 +278,11 @@ This works because the `serifier` and `deserifier` functions are applied recursi
 
 ## Redux
 
-The `createReduxMiddleware` function generates a Redux middleware that will
-serify every value pushed to your Redux store. If you use
-[Redux Toolkit](https://redux-toolkit.js.org/), leave the default
-`serializeCheck` middleware in place and it will notify you if you need to add a
-new type to your serify options!
+The `createReduxMiddleware` function generates a Redux middleware that will serify every value pushed to your Redux store. If you use [Redux Toolkit](https://redux-toolkit.js.org/), leave the default `serializeCheck` middleware in place and it will notify you if you need to add a new type to your serify options!
 
-When retrieving values from the Redux store, either deserify them explicitly or
-wrap your selectors in the `deserify` function.
+When retrieving values from the Redux store, either deserify them explicitly or wrap your selectors in the `deserify` function.
 
-See the [`createReduxMiddleware` unit tests](./src/createReduxMiddleware/createReduxMiddleware.test.ts) for a fully worked out example with custom types, or just try this for the out-of-the-box experience (H/T [@tuffstuff9](https://github.com/tuffstuff9)):
+See the [`createReduxMiddleware` unit tests](https://github.com/karmaniverous/serify-deserify/tree/main/src/createReduxMiddleware/createReduxMiddleware.test.ts) for a fully worked out example with custom types, or just try this for the out-of-the-box experience (H/T [@tuffstuff9](https://github.com/tuffstuff9)):
 
 ```ts
 import {
@@ -323,5 +322,4 @@ It is implicitly assumed that the input value is composed entirely of serializab
 
 ---
 
-See more great templates and other tools on
-[my GitHub Profile](https://github.com/karmaniverous)!
+See more great templates and other tools on [my GitHub Profile](https://github.com/karmaniverous)!

@@ -1,18 +1,37 @@
+/**
+ * Core types & type guards shared by {@link serify} and {@link deserify}: the
+ * {@link SerifiableTypeMap}, {@link SerifyOptions}, and the serified-value
+ * shape. Pure; no side effects.
+ *
+ * @module
+ */
 import { isBoolean, isNull, isNumber, isPlainObject, isString } from 'is-what';
 
 /**
- * A mapping of serifiable class names to their types.
+ * A mapping of serifiable type names to their types before & after
+ * serification.
+ *
+ * @remarks
+ * Each key is a type identifier (a class name, or the value of a class's
+ * {@link serifyStaticTypeProperty} static property). Each value is a tuple of
+ * the form `[UnserifiedType, SerifiedType]`.
+ *
+ * Extend this interface to describe your own custom types. See
+ * {@link DefaultTypeMap} for an example.
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type SerifiableTypeMap = Record<string, [any, any]>;
+export type SerifiableTypeMap = Record<string, [unknown, unknown]>;
 
 /**
- * A serializable primitive.
+ * A primitive value that is natively supported by `JSON.stringify` &
+ * `JSON.parse`.
  */
-type SerializablePrimitive = boolean | number | null | string;
+export type SerializablePrimitive = boolean | number | null | string;
 
 /**
  * Serializable primitive type guard.
+ *
+ * @param value - The value to test.
+ * @returns `true` if `value` is a {@link SerializablePrimitive}.
  */
 export function isSerializablePrimitive(
   value: unknown,
@@ -23,51 +42,77 @@ export function isSerializablePrimitive(
 }
 
 /**
- * A function that converts an unserifiable value into a serifiable one, given
- * knowledge of the underlying type.
- */
-type SerifierCallback<M extends SerifiableTypeMap, T extends M[keyof M]> = (
-  value: T[0],
-) => T[1];
-
-/**
- * A function that converts an serifiable value into the original serifiable
- * one, given knowledge of the underlying type.
- */
-type DeserifierCallback<M extends SerifiableTypeMap, T extends M[keyof M]> = (
-  value: T[1],
-) => T[0];
-
-/**
  * A pair of serifier/deserifier callbacks for a given type.
+ *
+ * @typeParam T - The `[UnserifiedType, SerifiedType]` tuple of the target type.
+ *
+ * @remarks
+ * The callbacks are declared with method syntax so that their parameters are
+ * checked bivariantly. This lets a strongly-typed callback (e.g.
+ * `(value: bigint) => string`) satisfy the `[unknown, unknown]` index
+ * signature inherited from {@link SerifiableTypeMap} without resorting to
+ * `any`.
  */
-interface SerifyOptionTypeCallbacks<
-  M extends SerifiableTypeMap,
-  T extends M[keyof M],
-> {
-  serifier: SerifierCallback<M, T>;
-  deserifier: DeserifierCallback<M, T>;
+export interface SerifyOptionTypeCallbacks<T extends [unknown, unknown]> {
+  /**
+   * Converts an unserifiable value of the target type into a serifiable one.
+   *
+   * @param value - The unserified value.
+   * @returns The serified value. May itself contain unserified values, which
+   * will be serified recursively.
+   */
+  serifier(value: T[0]): T[1];
+
+  /**
+   * Converts a serified value back into the target type.
+   *
+   * @param value - The serified value, with its contents already deserified.
+   * @returns The deserified value.
+   */
+  deserifier(value: T[1]): T[0];
 }
 
 /**
  * Options defining serifiable types and related callback functions.
+ *
+ * @typeParam M - The {@link SerifiableTypeMap} describing supported types.
  */
 export interface SerifyOptions<M extends SerifiableTypeMap> {
+  /**
+   * Marker value written to every serified value. Change it to disambiguate
+   * serified values from data that happens to share their shape.
+   */
   serifyKey: SerializablePrimitive;
-  types: { [T in keyof M]: SerifyOptionTypeCallbacks<M, M[T]> };
+
+  /** Serifier/deserifier callbacks, keyed by type identifier. */
+  types: { [T in keyof M]: SerifyOptionTypeCallbacks<M[T]> };
 }
 
 /**
- * A serified value.
+ * The serializable form produced by {@link serify} for a value of a type
+ * supported by {@link SerifyOptions}.
+ *
+ * @typeParam M - The {@link SerifiableTypeMap} describing supported types.
  */
-interface SerifiedValue<M extends SerifiableTypeMap> {
+export interface SerifiedValue<M extends SerifiableTypeMap> {
+  /** The {@link SerifyOptions.serifyKey} in effect at serification. */
   serifyKey: SerifyOptions<M>['serifyKey'];
-  type: keyof M;
+
+  /** The type identifier of the original value. */
+  type: keyof M & string;
+
+  /** The serified contents of the original value. */
   value: unknown;
 }
 
 /**
- * Serified value type guard.
+ * Serified value type guard. Used by {@link deserify} to recognise values
+ * produced by {@link serify}.
+ *
+ * @param value - The value to test.
+ * @param options - The {@link SerifyOptions} in effect.
+ * @returns `true` if `value` has the shape of a {@link SerifiedValue} whose
+ * `serifyKey` matches `options` and whose `type` is supported by `options`.
  */
 export function isSerifiedValue<M extends SerifiableTypeMap>(
   value: unknown,
@@ -78,7 +123,8 @@ export function isSerifiedValue<M extends SerifiableTypeMap>(
     'serifyKey' in value &&
     value.serifyKey === options.serifyKey &&
     'type' in value &&
-    (value.type as string) in options.types &&
+    isString(value.type) &&
+    value.type in options.types &&
     'value' in value
   );
 }
@@ -86,9 +132,14 @@ export function isSerifiedValue<M extends SerifiableTypeMap>(
 /**
  * Null-prototype object type guard.
  *
+ * @param value - The value to test.
+ * @returns `true` if `value` is an object with a `null` prototype.
+ *
  * @example
- *   isNullObject(Object.create(null)) === true;
- *   isNullObject({}) === false;
+ * ```ts
+ * isNullObject(Object.create(null)); // true
+ * isNullObject({}); // false
+ * ```
  */
 export function isNullObject(value: unknown): value is Record<string, unknown> {
   return (

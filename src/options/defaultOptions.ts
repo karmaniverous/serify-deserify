@@ -1,14 +1,48 @@
-import type { SerifiableTypeMap, SerifyOptions } from '../types.js';
+/**
+ * Default {@link SerifyOptions}: out-of-the-box support for `BigInt`, `Date`,
+ * `Map`, `Set`, `undefined`, and null-prototype objects. Pure data.
+ *
+ * @module
+ */
+import type { SerifiableTypeMap, SerifyOptions } from '../types';
 
+/**
+ * {@link SerifiableTypeMap} describing the types supported by
+ * {@link defaultOptions}.
+ *
+ * @remarks
+ * Extend this interface to add custom types to the default set.
+ */
 export interface DefaultTypeMap extends SerifiableTypeMap {
+  /** `bigint` values, serified as decimal strings. */
   BigInt: [bigint, string];
+
+  /** `Date` values, serified as epoch milliseconds. */
   Date: [Date, number];
+
+  /** `Map` values, serified as arrays of entries. */
   Map: [Map<unknown, unknown>, [unknown, unknown][]];
+
+  /** `Set` values, serified as arrays of values. */
   Set: [Set<unknown>, unknown[]];
+
+  /** `undefined`, serified as `null`. */
   Undefined: [undefined, null];
+
+  /** Null-prototype objects, serified as plain objects. */
   NullObject: [object, object];
 }
 
+/**
+ * Default {@link SerifyOptions}, supporting every type in
+ * {@link DefaultTypeMap} with a `null` {@link SerifyOptions.serifyKey}.
+ *
+ * @example
+ * ```ts
+ * const serified = serify(42n, defaultOptions);
+ * // { serifyKey: null, type: 'BigInt', value: '42' }
+ * ```
+ */
 export const defaultOptions: SerifyOptions<DefaultTypeMap> = {
   serifyKey: null,
   types: {
@@ -35,7 +69,7 @@ export const defaultOptions: SerifyOptions<DefaultTypeMap> = {
     NullObject: {
       serifier: (value) => ({ ...value }),
       deserifier: (value) =>
-        Object.assign(Object.create(null), value) as object,
+        Object.assign(Object.create(null) as object, value),
     },
   },
 };
