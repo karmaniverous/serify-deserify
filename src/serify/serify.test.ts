@@ -1,9 +1,15 @@
 import { afterEach, describe, expect, it } from 'vitest';
 
-import { defaultOptions, serify } from '../';
+import { defaultOptions, serify, type SerifyOptions } from '../';
 import { Custom, customOptions } from '../test/Custom';
 import { CustomFoo, customFooOptions } from '../test/CustomFoo';
 import { complexSerified, complexValue } from '../test/fixtures';
+
+/** Options supporting only `BigInt`: no `Number`, `Custom`, etc. */
+const bigIntOnlyOptions: SerifyOptions<{ BigInt: [bigint, string] }> = {
+  serifyKey: null,
+  types: { BigInt: defaultOptions.types.BigInt },
+};
 
 describe('serify', () => {
   describe('serializable values', () => {
@@ -71,7 +77,13 @@ describe('serify', () => {
       ],
       ['Set', new Set(['a', 2]), ['a', 2]],
       ['Undefined', undefined, null],
-    ])('wraps a %s', (type, v, value) => {
+      ['Number (NaN)', NaN, 'NaN'],
+      ['Number (Infinity)', Infinity, 'Infinity'],
+      ['Number (-Infinity)', -Infinity, '-Infinity'],
+      ['Number (-0)', -0, '-0'],
+    ])('wraps a %s', (label, v, value) => {
+      const type = label.split(' ')[0];
+
       expect(serify(v, defaultOptions)).toStrictEqual({
         serifyKey: null,
         type,
@@ -229,6 +241,7 @@ describe('serify', () => {
     it.each([
       ['a class instance with no configured type', new Custom(42n), 'Custom'],
       ['a symbol', Symbol('s'), 'Symbol'],
+      ['a non-JSON number with no Number type configured', Infinity, 'Number'],
       ['a function', () => 1, 'Function'],
       [
         'an object whose prototype chain has no constructor',
@@ -236,7 +249,7 @@ describe('serify', () => {
         'Object',
       ],
     ])('throws on %s', (_, v, type) => {
-      expect(() => serify(v, defaultOptions)).toThrow(
+      expect(() => serify(v, bigIntOnlyOptions)).toThrow(
         `unserifiable type: ${type}`,
       );
     });

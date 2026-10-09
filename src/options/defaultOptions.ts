@@ -1,6 +1,7 @@
 /**
  * Default {@link SerifyOptions}: out-of-the-box support for `BigInt`, `Date`,
- * `Map`, `Set`, `undefined`, and null-prototype objects. Pure data.
+ * `Map`, `Set`, `undefined`, null-prototype objects, and the numbers JSON can't
+ * represent (`NaN`, `Infinity`, `-Infinity` & `-0`). Pure data.
  *
  * @module
  */
@@ -31,6 +32,12 @@ export interface DefaultTypeMap extends SerifiableTypeMap {
 
   /** Null-prototype objects, serified as plain objects. */
   NullObject: [object, object];
+
+  /**
+   * Numbers JSON can't represent (`NaN`, `Infinity`, `-Infinity` & `-0`),
+   * serified as strings. Other numbers are serializable and pass through.
+   */
+  Number: [number, string];
 }
 
 /**
@@ -70,6 +77,11 @@ export const defaultOptions: SerifyOptions<DefaultTypeMap> = {
       serifier: (value) => ({ ...value }),
       deserifier: (value) =>
         Object.assign(Object.create(null) as object, value),
+    },
+    Number: {
+      // String(-0) is '0', so -0 needs an explicit encoding.
+      serifier: (value) => (Object.is(value, -0) ? '-0' : String(value)),
+      deserifier: (value) => Number(value),
     },
   },
 };

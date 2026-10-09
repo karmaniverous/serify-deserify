@@ -5,7 +5,7 @@
  *
  * @module
  */
-import { isBoolean, isNull, isNumber, isPlainObject, isString } from 'is-what';
+import { isBoolean, isNull, isPlainObject, isString } from 'is-what';
 
 /**
  * A mapping of serifiable type names to their types before & after
@@ -24,6 +24,11 @@ export type SerifiableTypeMap = Record<string, [unknown, unknown]>;
 /**
  * A primitive value that is natively supported by `JSON.stringify` &
  * `JSON.parse`.
+ *
+ * @remarks
+ * At runtime, only numbers that survive a JSON round trip exactly qualify:
+ * `NaN`, `Infinity`, `-Infinity` & `-0` do not. {@link defaultOptions}
+ * handles those as the `Number` type.
  */
 export type SerializablePrimitive = boolean | number | null | string;
 
@@ -31,13 +36,20 @@ export type SerializablePrimitive = boolean | number | null | string;
  * Serializable primitive type guard.
  *
  * @param value - The value to test.
- * @returns `true` if `value` is a {@link SerializablePrimitive}.
+ * @returns `true` if `value` is `null`, a boolean, a string, or a finite
+ * number other than `-0`, i.e. a primitive that survives a
+ * `JSON.stringify`/`JSON.parse` round trip unchanged.
  */
 export function isSerializablePrimitive(
   value: unknown,
 ): value is SerializablePrimitive {
   return (
-    isBoolean(value) || isNumber(value) || isNull(value) || isString(value)
+    isBoolean(value) ||
+    isNull(value) ||
+    isString(value) ||
+    (typeof value === 'number' &&
+      Number.isFinite(value) &&
+      !Object.is(value, -0))
   );
 }
 

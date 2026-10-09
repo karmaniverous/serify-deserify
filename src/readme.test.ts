@@ -35,14 +35,11 @@ describe('README', () => {
   });
 
   it('Serifiable Types: caveats', () => {
-    const v = { a: 1, i: -Infinity };
+    const v = { a: 1 };
     Object.defineProperty(v, 'hidden', { value: 1, enumerable: false });
     Object.defineProperty(v, Symbol('s'), { value: 1, enumerable: true });
 
-    expect(JSON.stringify(serify(v, defaultOptions))).toBe('{"a":1,"i":null}');
-    expect(() => serify(NaN, defaultOptions)).toThrow(
-      'unserifiable type: Number',
-    );
+    expect(JSON.stringify(serify(v, defaultOptions))).toBe('{"a":1}');
   });
 
   it('serifyKey', () => {
@@ -71,6 +68,7 @@ describe('README', () => {
           new Set([1]),
           undefined,
           nullObject,
+          -Infinity,
         ],
         defaultOptions,
       ),
@@ -81,6 +79,7 @@ describe('README', () => {
       { serifyKey: null, type: 'Set', value: [1] },
       { serifyKey: null, type: 'Undefined', value: null },
       { serifyKey: null, type: 'NullObject', value: { a: 1 } },
+      { serifyKey: null, type: 'Number', value: '-Infinity' },
     ]);
   });
 

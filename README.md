@@ -54,14 +54,13 @@ Every example in this README is exercised by [`readme.test.ts`](https://github.c
 A _serifiable type_ is any type that is:
 
 - supported by `JSON.stringify` and `JSON.parse`, i.e. `null`, booleans, numbers, strings, plain objects, and arrays.
-- natively supported by `serify`, i.e. `BigInt`, `Date`, `Map`, `Set`, `undefined`, and null-prototype objects (`Object.create(null)`).
+- natively supported by `serify`, i.e. `BigInt`, `Date`, `Map`, `Set`, `undefined`, null-prototype objects (`Object.create(null)`), and the numbers JSON can't represent (`NaN`, `Infinity`, `-Infinity` & `-0`).
 - added to `serify` as a [custom type](#custom-configuration).
 - composed exclusively of any of the above (e.g. an array of BigInt-keyed Maps of objects containing Sets of custom class instances).
 
-A few caveats inherited from `JSON.stringify`:
+Numbers that `JSON.stringify` can't round-trip (`NaN`, `Infinity` & `-Infinity` become `null`; `-0` becomes `0`) are serified as the `Number` type. Every other number passes through untouched. If your options don't include a `Number` type, `serify` [throws](#errors) on these values.
 
-- Finite numbers, `Infinity` & `-Infinity` are passed through untouched, so the infinities still serialize as `null`. `NaN` is not treated as a serializable number, so `serify` throws `unserifiable type: Number` unless you configure a `Number` type.
-- Only own, enumerable, string-keyed properties of objects are serified. Symbol-keyed and non-enumerable properties are dropped.
+Only own, enumerable, string-keyed properties of objects are serified. As with `JSON.stringify`, symbol-keyed and non-enumerable properties are dropped.
 
 Anything else (e.g. a symbol, a function, or an instance of a class that is not configured in your options) causes `serify` to [throw](#errors).
 
@@ -97,14 +96,15 @@ Objects whose `type` is not configured in your options are never deserified, wha
 
 Out of the box, the [`defaultOptions`](https://github.com/karmaniverous/serify-deserify/tree/main/src/options/defaultOptions.ts) object has a `null` `serifyKey` and supports these types:
 
-| Type key     | Value                   | Serified `value`                |
-| ------------ | ----------------------- | ------------------------------- |
-| `BigInt`     | `bigint`                | decimal string                  |
-| `Date`       | `Date`                  | epoch milliseconds (`number`)   |
-| `Map`        | `Map`                   | array of `[key, value]` entries |
-| `Set`        | `Set`                   | array of values                 |
-| `Undefined`  | `undefined`             | `null`                          |
-| `NullObject` | null-prototype `object` | plain object                    |
+| Type key     | Value                    | Serified `value`                |
+| ------------ | ------------------------ | ------------------------------- |
+| `BigInt`     | `bigint`                 | decimal string                  |
+| `Date`       | `Date`                   | epoch milliseconds (`number`)   |
+| `Map`        | `Map`                    | array of `[key, value]` entries |
+| `Set`        | `Set`                    | array of values                 |
+| `Undefined`  | `undefined`              | `null`                          |
+| `NullObject` | null-prototype `object`  | plain object                    |
+| `Number`     | `NaN`, `±Infinity`, `-0` | string, e.g. `'-Infinity'`      |
 
 If you only need the default configuration, simply import the `defaultOptions` object and pass it to `serify` and `deserify`, as in the [Usage](#usage) example above.
 
@@ -116,7 +116,7 @@ If you need to change the `serifyKey` or add custom types, you can create a new 
 
 1. A null-prototype object's key is `NullObject`.
 2. Any other object whose prototype chain has a constructor (e.g. a class instance) is keyed by the value of its class's [Static Type Property](#static-type-property) if it has one, otherwise by its class name. The constructor is read from the prototype, so a property named `constructor` can't spoof it.
-3. Anything else gets the type name reported by [`is-what`](https://www.npmjs.com/package/is-what)'s `getType` (e.g. `BigInt`, `Undefined`, `Symbol`, `Function`).
+3. Anything else gets the type name reported by [`is-what`](https://www.npmjs.com/package/is-what)'s `getType` (e.g. `BigInt`, `Number`, `Undefined`, `Symbol`, `Function`).
 
 ```js
 import {
@@ -345,7 +345,7 @@ const value = deserify(store.getState().test.value, defaultOptions);
 // 42n
 ```
 
-Note that the middleware replaces the `payload` of the dispatched action object in place.
+Note that the middleware replaces the `payload` of the dispatched action object in place, then passes the action on and returns the result, so `dispatch` return values are preserved.
 
 ## Immutability
 

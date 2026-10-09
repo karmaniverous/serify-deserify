@@ -52,6 +52,10 @@ describe('deserify', () => {
       ],
       ['Set', ['a', 2], new Set(['a', 2])],
       ['Undefined', null, undefined],
+      ['Number', 'NaN', NaN],
+      ['Number', 'Infinity', Infinity],
+      ['Number', '-Infinity', -Infinity],
+      ['Number', '-0', -0],
     ])('restores a %s', (type, value, expected) => {
       expect(
         deserify({ serifyKey: null, type, value }, defaultOptions),
@@ -85,6 +89,17 @@ describe('deserify', () => {
 
       expect(v).toStrictEqual(complexSerified);
     });
+
+    it.each([NaN, Infinity, -Infinity, -0, 0, 1.5])(
+      'round-trips the number %s exactly through JSON',
+      (v) => {
+        const json = JSON.stringify(serify(v, defaultOptions));
+
+        expect(
+          Object.is(deserify(JSON.parse(json) as unknown, defaultOptions), v),
+        ).toBe(true);
+      },
+    );
 
     it('reverses serify after a JSON round trip', () => {
       const json = JSON.stringify(serify(complexValue(), defaultOptions));
