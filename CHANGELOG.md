@@ -4,9 +4,22 @@ All notable changes to this project will be documented in this file.
 
 ## [unreleased]
 
+### 🚀 Features
+
+- [**breaking**] Round-trip NaN, Infinity, -Infinity & -0 exactly
+
+### 🐛 Bug Fixes
+
+- Return next(action) from Redux middleware
+- Match only own keys of options.types
+
 ### ⚙️ Chores
 
 - Add copilot review instructions
+- Modernize toolchain from npm-package-template-ts
+- [**breaking**] Convert to ESM-only output
+- Tighten lint, coverage & changelog config
+- Declare @reduxjs/toolkit as optional peer dependency
 
 ### 💼 Other
 
@@ -20,6 +33,18 @@ All notable changes to this project will be documented in this file.
 A `TS2339` issue was raised with the previous ordering.
 - Add object key handling tests
 - Correctly get type of shadowed constructor object
+
+### 🔨 Refactoring
+
+- Extract shared container traversal from serify & deserify
+
+### 📚 Documentation
+
+- Sync README with implementation
+
+### 🧪 Testing
+
+- Make tests table-driven and assert behaviour, not implementation
 ## [v2.0.11] - 2024-08-27
 
 ### 💼 Other
