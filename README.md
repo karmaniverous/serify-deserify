@@ -295,6 +295,8 @@ This works because `serify` & `deserify` are applied recursively: `serify` serif
 
 The `createReduxMiddleware` function generates a Redux middleware that will serify the `payload` of every action dispatched to your Redux store, so that only serializable values reach your reducers.
 
+`@reduxjs/toolkit` (v2) is an optional peer dependency: its `Middleware` type appears in this package's type declarations, but nothing from it is imported at runtime. Install it if you use `createReduxMiddleware`; otherwise you can ignore it.
+
 If you dispatch a value of a type that is not configured in your options, `dispatch` will throw an `unserifiable type` [error](#errors) naming the missing type. Leave [Redux Toolkit](https://redux-toolkit.js.org/)'s default `serializableCheck` middleware in place as a backstop for anything that slips into your store some other way.
 
 When retrieving values from the Redux store, either deserify them explicitly or wrap your selectors in the `deserify` function.
