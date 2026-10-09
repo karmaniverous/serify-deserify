@@ -92,7 +92,7 @@ export const serify = <M extends SerifiableTypeMap = DefaultTypeMap>(
 
   const valueType = getSerifyTypeIdentifier(value);
 
-  if (valueType in options.types)
+  if (Object.hasOwn(options.types, valueType))
     return {
       serifyKey: options.serifyKey,
       type: valueType,

@@ -1,6 +1,11 @@
 import { afterEach, describe, expect, it } from 'vitest';
 
-import { defaultOptions, serify, type SerifyOptions } from '../';
+import {
+  defaultOptions,
+  serify,
+  type SerifyOptions,
+  serifyStaticTypeProperty,
+} from '../';
 import { Custom, customOptions } from '../test/Custom';
 import { CustomFoo, customFooOptions } from '../test/CustomFoo';
 import { complexSerified, complexValue } from '../test/fixtures';
@@ -228,6 +233,17 @@ describe('serify', () => {
   });
 
   describe('type identification', () => {
+    it('does not match a type key inherited from Object.prototype', () => {
+      class Sneaky {
+        static [serifyStaticTypeProperty] = 'hasOwnProperty';
+        readonly id = 1;
+      }
+
+      expect(() => serify(new Sneaky(), defaultOptions)).toThrow(
+        'unserifiable type: hasOwnProperty',
+      );
+    });
+
     it('ignores an own constructor property holding a function', () => {
       const v = { constructor: Date, hour: 9 };
 

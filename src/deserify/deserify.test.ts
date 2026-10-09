@@ -145,6 +145,14 @@ describe('deserify', () => {
       ['a non-string type', { serifyKey: null, type: 7, value: 1 }],
       ['a missing value key', { serifyKey: null, type: 'Custom' }],
       ['a missing serifyKey', { type: 'Custom', value: 1 }],
+      [
+        'a type inherited from Object.prototype',
+        { serifyKey: null, type: 'toString', value: 1 },
+      ],
+      [
+        'a constructor type',
+        { serifyKey: null, type: 'constructor', value: 1 },
+      ],
     ])('treats an object with %s as a plain object', (_, v) => {
       expect(deserify(v, customOptions)).toStrictEqual(v);
     });

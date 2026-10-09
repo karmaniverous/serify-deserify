@@ -124,7 +124,8 @@ export interface SerifiedValue<M extends SerifiableTypeMap> {
  * @param value - The value to test.
  * @param options - The {@link SerifyOptions} in effect.
  * @returns `true` if `value` has the shape of a {@link SerifiedValue} whose
- * `serifyKey` matches `options` and whose `type` is supported by `options`.
+ * `serifyKey` matches `options` and whose `type` is an own key of
+ * `options.types` (so inherited names like `toString` never match).
  */
 export function isSerifiedValue<M extends SerifiableTypeMap>(
   value: unknown,
@@ -136,7 +137,7 @@ export function isSerifiedValue<M extends SerifiableTypeMap>(
     value.serifyKey === options.serifyKey &&
     'type' in value &&
     isString(value.type) &&
-    value.type in options.types &&
+    Object.hasOwn(options.types, value.type) &&
     'value' in value
   );
 }
