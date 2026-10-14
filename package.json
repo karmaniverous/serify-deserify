@@ -89,7 +89,9 @@
       "requireBranch": "main"
     },
     "github": {
-      "release": true
+      "release": true,
+      "releaseName": "${name.split('/').pop()}@${version}",
+      "releaseNotes": "npx git-cliff --tag v${version} --unreleased --strip header"
     },
     "hooks": {
       "after:init": [
@@ -105,7 +107,7 @@
         "git switch ${branchName}"
       ],
       "after:bump": [
-        "npx git-cliff -o CHANGELOG.md",
+        "npx git-cliff --tag v${version} -o CHANGELOG.md",
         "npm run docs",
         "git add CHANGELOG.md"
       ]
